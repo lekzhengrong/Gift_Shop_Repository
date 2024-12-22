@@ -1,37 +1,35 @@
-<!-- page.build-box.liquid -->
+<div id="customizable-product" class="customizable-product">
+  <!-- Step 1: Choose a Box -->
+  <div id="step-1" class="step active">
+    <h2>Step 1: Choose a Box</h2>
+    <div class="box-options">
+      {% for product in collections['gift-boxes'].products %}
+        <div class="box-option">
+          <input type="radio" id="box-{{ product.id }}" name="box" value="{{ product.id }}">
+          <label for="box-{{ product.id }}">
+            <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
+            <p>{{ product.title }}</p>
+          </label>
+        </div>
+      {% endfor %}
+    </div>
+    <button id="next-to-step-2" class="next-button">Next</button>
+  </div>
 
-{% layout 'theme' %}
-
-<div class="page-container">
-  <h1 class="page-title">Welcome to Our Build Your Box Experience</h1>
-  <p>Build your perfect box with our unique products! Click the button below to start creating your custom box.</p>
-  
-  <!-- Button to link to multi-step page -->
-  <a href="/pages/multi-step-page" class="btn-build-your-box">Build Your Box</a>
+  <!-- Step 2: Choose Products -->
+  <div id="step-2" class="step">
+    <h2>Step 2: Choose Products</h2>
+    <div class="product-options">
+      {% for product in collections['gift-products'].products %}
+        <div class="product-option">
+          <input type="checkbox" id="product-{{ product.id }}" name="products" value="{{ product.id }}">
+          <label for="product-{{ product.id }}">
+            <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
+            <p>{{ product.title }}</p>
+          </label>
+        </div>
+      {% endfor %}
+    </div>
+    <button id="add-to-cart" class="add-to-cart-button">Add to Cart</button>
+  </div>
 </div>
-
-<!-- Simple Styling -->
-<style>
-  .page-container {
-    text-align: center;
-    padding: 20px;
-  }
-
-  .page-title {
-    font-size: 2rem;
-    margin-bottom: 20px;
-  }
-
-  .btn-build-your-box {
-    background-color: #4CAF50;
-    color: white;
-    padding: 15px 25px;
-    text-decoration: none;
-    border-radius: 5px;
-    font-size: 1.2rem;
-  }
-
-  .btn-build-your-box:hover {
-    background-color: #45a049;
-  }
-</style>
