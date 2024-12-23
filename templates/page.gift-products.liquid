@@ -31,36 +31,56 @@
     </form>
 
     <script>
+        // Extract the gift box ID from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const boxId = urlParams.get('box_id');  // Extract box_id parameter from URL
+    
+        console.log('Box ID from URL:', boxId);  // Debugging: Log the extracted box_id
+    
+        if (boxId) {
+            // Set the box_id value in the hidden input field
+            const boxInput = document.getElementById('box-id');
+            if (boxInput) {
+                boxInput.value = boxId;
+                console.log('Box ID set in hidden input:', boxId);  // Debugging: Confirm value set
+            }
+        } else {
+            alert('No gift box selected. Please return to the previous page.');
+            window.location.href = '/pages/gift-boxes'; // Redirect to the gift box selection page
+            return; // Stop further execution if box_id is missing
+        }
+    
+        // Handle form submission
         document.getElementById('add-to-cart').addEventListener('click', async function (event) {
-            event.preventDefault();  // Prevent the default form submission
-
-            // Validate the box ID
+            event.preventDefault();  // Prevent default form submission
+    
+            // Validate the box ID from the hidden input
             const boxId = document.getElementById('box-id').value;
             if (!boxId) {
                 alert("No gift box selected. Please return to the previous page.");
                 return;
             }
-
+    
             // Collect selected products
             const selectedProducts = document.querySelectorAll('input[name="items[]"]:checked');
             if (selectedProducts.length === 0) {
                 alert("Please select at least one product to add to the box.");
                 return;
             }
-
+    
             // Prepare the items array for the cart API
             const items = [
                 { id: boxId, quantity: 1 }, // Add the selected gift box
             ];
-
+    
             // Add selected products to the items array
             selectedProducts.forEach(product => {
                 items.push({ id: product.value, quantity: 1 });
             });
-
+    
             // Debugging: Log the items array to ensure it has correct data
             console.log("Items to be added to cart:", items);
-
+    
             // Make a POST request to Shopify's cart API
             try {
                 const response = await fetch('/cart/add.js', {
@@ -70,7 +90,7 @@
                     },
                     body: JSON.stringify({ items }),
                 });
-
+    
                 if (response.ok) {
                     // Redirect to the cart page on success
                     window.location.href = '/cart';
@@ -86,7 +106,6 @@
                 alert("An error occurred. Please try again.");
             }
         });
-
     </script>
     
 </body>
