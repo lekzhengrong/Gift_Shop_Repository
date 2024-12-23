@@ -13,21 +13,38 @@
   </head>
   <body>
       <h2>Step 1: Choose a Gift Box</h2>
-      <form action="/pages/gift-products-page" method="GET" id="gift-box-form">
-          <div class="box-options">
-              {% for product in collections['gift-boxes'].products %}
-                  <div class="box-option">
-                      <input type="radio" id="box-{{ product.id }}" name="box_id" value="{{ product.id }}" required>
-                      <label for="box-{{ product.id }}">
-                          <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-                          <p>{{ product.title }}</p>
-                      </label>
-                  </div>
-              {% endfor %}
-          </div>
-          <button type="submit" class="next-button">Next</button>
-      </form>
+      <div class="box-options">
+          {% for product in collections['gift-boxes'].products %}
+              <div class="box-option">
+                  <input type="radio" id="box-{{ product.id }}" name="box_id" value="{{ product.id }}" required>
+                  <label for="box-{{ product.id }}">
+                      <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
+                      <p>{{ product.title }}</p>
+                  </label>
+              </div>
+          {% endfor %}
+      </div>
+      <button id="next-button" class="next-button">Next</button>
+
+      <script>
+                document.getElementById('next-button').addEventListener('click', function () {
+          // Get the selected gift box
+          const selectedBox = document.querySelector('input[name="box_id"]:checked');
+          if (!selectedBox) {
+              alert('Please select a gift box!');
+              return;
+          }
+
+          // Get the selected box ID
+          const boxId = selectedBox.value;
+
+          // Redirect to the next page with the box_id
+          window.location.href = `/pages/gift-product?box_id=${boxId}`;
+      });
+
+      </script>
   </body>
-</html>
+  </html>
+
 
 </div>
