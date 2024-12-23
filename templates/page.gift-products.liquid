@@ -12,8 +12,10 @@
 </head>
 <body>
     <h2>Step 2: Choose Products</h2>
-    <form action="/cart/add" method="POST" id="gift-products-form">
-        <input type="hidden" name="id" value="{{ box_id }}">
+    <form action="/cart/add" method="POST">
+        <!-- Hidden input for the selected gift box -->
+        <input type="hidden" name="id" id="box-id" value="">
+
         <div class="product-options">
             {% for product in collections['gift-products'].products %}
                 <div class="product-option">
@@ -27,11 +29,18 @@
         </div>
         <button type="submit" class="add-to-cart-button">Add to Cart</button>
     </form>
+
     <script>
-        // Add the selected gift box to the cart as part of the POST payload
+        // Load the selected gift box ID from the query parameter
         const urlParams = new URLSearchParams(window.location.search);
         const boxId = urlParams.get('box_id');
-        document.querySelector('input[name="id"]').value = boxId;
+
+        if (boxId) {
+            document.getElementById('box-id').value = boxId;
+        } else {
+            alert('No gift box selected. Please return to the previous page.');
+            window.location.href = '/pages/gift-boxes';
+        }
     </script>
 </body>
 </html>
