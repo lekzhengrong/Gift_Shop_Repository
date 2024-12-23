@@ -1,35 +1,33 @@
 <div id="customizable-product" class="customizable-product">
-  <!-- Step 1: Choose a Box -->
-  <div id="step-1" class="step active">
-    <h2>Step 1: Choose a Box</h2>
-    <div class="box-options">
-      {% for product in collections['gift-boxes'].products %}
-        <div class="box-option">
-          <input type="radio" id="box-{{ product.id }}" name="box" value="{{ product.id }}">
-          <label for="box-{{ product.id }}">
-            <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-            <p>{{ product.title }}</p>
-          </label>
-        </div>
-      {% endfor %}
-    </div>
-    <button id="next-to-step-2" class="next-button">Next</button>
-  </div>
+    <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Select Gift Box</title>
+      <style>
+          .box-options { display: flex; gap: 20px; }
+          .box-option { text-align: center; }
+          .box-option img { width: 150px; height: auto; }
+      </style>
+  </head>
+  <body>
+      <h2>Step 1: Choose a Gift Box</h2>
+      <form action="/pages/gift-products-page" method="GET" id="gift-box-form">
+          <div class="box-options">
+              {% for product in collections['gift-boxes'].products %}
+                  <div class="box-option">
+                      <input type="radio" id="box-{{ product.id }}" name="box_id" value="{{ product.id }}" required>
+                      <label for="box-{{ product.id }}">
+                          <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
+                          <p>{{ product.title }}</p>
+                      </label>
+                  </div>
+              {% endfor %}
+          </div>
+          <button type="submit" class="next-button">Next</button>
+      </form>
+  </body>
+</html>
 
-  <!-- Step 2: Choose Products -->
-  <div id="step-2" class="step">
-    <h2>Step 2: Choose Products</h2>
-    <div class="product-options">
-      {% for product in collections['gift-products'].products %}
-        <div class="product-option">
-          <input type="checkbox" id="product-{{ product.id }}" name="products" value="{{ product.id }}">
-          <label for="product-{{ product.id }}">
-            <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-            <p>{{ product.title }}</p>
-          </label>
-        </div>
-      {% endfor %}
-    </div>
-    <button id="add-to-cart" class="add-to-cart-button">Add to Cart</button>
-  </div>
 </div>
