@@ -19,12 +19,11 @@
         <div class="product-options">
             {% for product in collections['gift-products'].products %}
                 <div class="product-option">
-                        <input type="checkbox" id="product-{{ product.variants.first.id }}" name="items[]" value="{{ product.variants.first.id }}">
-                        <label for="product-{{ product.variants.first.id }}">
-                            <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-                           <p>{{ product.title }}</p>
-                        </label>
-
+                    <input type="checkbox" id="product-{{ product.variants.first.id }}" name="items[]" value="{{ product.variants.first.id }}">
+                    <label for="product-{{ product.variants.first.id }}">
+                        <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
+                        <p>{{ product.title }}</p>
+                    </label>
                 </div>
             {% endfor %}
         </div>
@@ -32,7 +31,25 @@
     </form>
 
     <script>
-            document.getElementById('add-to-cart').addEventListener('click', async function (event) {
+        // Function to extract query parameters
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Get the box_id from the URL
+        const boxId = getQueryParam('box_id');
+        if (boxId) {
+            // Set the hidden input value
+            document.getElementById('box-id').value = boxId;
+        } else {
+            // If box_id is missing, alert the user and redirect to Step 1
+            alert("No gift box selected. Please return to the previous page.");
+            window.location.href = '/pages/gift-boxes'; // Replace with the actual URL for Step 1
+        }
+
+        // Add-to-cart functionality
+        document.getElementById('add-to-cart').addEventListener('click', async function (event) {
             event.preventDefault();  // Prevent default form submission
 
             // Validate the box ID from the hidden input
@@ -87,8 +104,6 @@
                 alert("An error occurred. Please try again.");
             }
         });
-
     </script>
-    
 </body>
 </html>
