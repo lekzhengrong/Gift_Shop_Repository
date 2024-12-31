@@ -12,7 +12,7 @@
 </head>
 <body>
     <h2>Step 2: Choose Products</h2>
-    <form action="/cart/add" method="POST">
+    <form id="gift-selection-form">
         <!-- Hidden input for the selected gift box -->
         <input type="hidden" name="id" id="box-id" value="">
 
@@ -27,7 +27,7 @@
                 </div>
             {% endfor %}
         </div>
-        <button type="submit" id="add-to-cart" class="add-to-cart-button">Add to Cart</button>
+        <button type="button" id="add-to-cart" class="add-to-cart-button">Add to Cart</button>
     </form>
 
     <script>
@@ -37,21 +37,17 @@
             return urlParams.get(param);
         }
 
-        // Get the box_id from the URL
+        // Set the box_id from the URL into the hidden input
         const boxId = getQueryParam('box_id');
         if (boxId) {
-            // Set the hidden input value
             document.getElementById('box-id').value = boxId;
         } else {
-            // If box_id is missing, alert the user and redirect to Step 1
             alert("No gift box selected. Please return to the previous page.");
-            window.location.href = '/pages/gift-boxes'; // Replace with the actual URL for Step 1
+            window.location.href = '/pages/gift-boxes'; // Replace with your Step 1 URL
         }
 
         // Add-to-cart functionality
-        document.getElementById('add-to-cart').addEventListener('click', async function (event) {
-            event.preventDefault();  // Prevent default form submission
-
+        document.getElementById('add-to-cart').addEventListener('click', async function () {
             // Validate the box ID from the hidden input
             const boxId = document.getElementById('box-id').value;
             if (!boxId) {
@@ -66,40 +62,33 @@
                 return;
             }
 
-            // Prepare the items array for the cart API
+            // Prepare the items array for Shopify API
             const items = [
                 { id: boxId, quantity: 1 }, // Add the selected gift box
+                ...Array.from(selectedProducts).map(product => ({
+                    id: product.value,
+                    quantity: 1,
+                }))
             ];
 
-            // Add selected products to the items array
-            selectedProducts.forEach(product => {
-                items.push({ id: product.value, quantity: 1 });
-            });
+            console.log("Items to be added to cart:", items); // Debugging
 
-            // Debugging: Log the items array to ensure it has correct data
-            console.log("Items to be added to cart:", items);
-
-            // Make a POST request to Shopify's cart API
+            // Send the POST request to Shopify's cart API
             try {
                 const response = await fetch('/cart/add.js', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ items }), // Correct payload structure
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(items), // Send a flat array of items
                 });
 
                 if (response.ok) {
-                    // Redirect to the cart page on success
-                    window.location.href = '/cart';
+                    window.location.href = '/cart'; // Redirect to cart page on success
                 } else {
-                    // Debugging: Log the response for errors
                     const error = await response.json();
                     console.error("Error response from Shopify:", error);
                     alert("Something went wrong while adding items to the cart.");
                 }
             } catch (error) {
-                // Debugging: Log the error for network issues
                 console.error("Network error:", error);
                 alert("An error occurred. Please try again.");
             }
