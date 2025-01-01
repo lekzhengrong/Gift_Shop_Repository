@@ -18,13 +18,15 @@
 
         <div class="product-options">
             {% for product in collections['gift-products'].products %}
-                <div class="product-option">
-                    <input type="checkbox" id="product-{{ product.variants.first.id }}" name="items[]" value="{{ product.variants.first.id }}">
-                    <label for="product-{{ product.variants.first.id }}">
-                        <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-                        <p>{{ product.title }}</p>
-                    </label>
-                </div>
+                {% for variant in product.variants %}
+                    <div class="product-option">
+                        <input type="checkbox" id="variant-{{ variant.id }}" name="items[]" value="{{ variant.id }}">
+                        <label for="variant-{{ variant.id }}">
+                            <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
+                            <p>{{ product.title }} ({{ variant.title }})</p>
+                        </label>
+                    </div>
+                {% endfor %}
             {% endfor %}
         </div>
         <button type="button" id="add-to-cart" class="add-to-cart-button">Add to Cart</button>
@@ -80,7 +82,7 @@
             const items = [
                 { id: boxId, quantity: 1 }, // Add the selected gift box
                 ...Array.from(selectedProducts).map(product => ({
-                    id: product.value,
+                    id: parseInt(product.value), // Ensure IDs are integers
                     quantity: 1,
                 }))
             ];
