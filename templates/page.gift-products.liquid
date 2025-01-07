@@ -18,15 +18,13 @@
 
         <div class="product-options">
             {% for product in collections['gift-products'].products %}
-                {% for variant in product.variants %}
-                    <div class="product-option">
-                        <input type="checkbox" id="variant-{{ variant.id }}" name="items[]" value="{{ variant.id }}">
-                        <label for="variant-{{ variant.id }}">
-                            <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-                            <p>{{ product.title }} ({{ variant.title }})</p>
-                        </label>
-                    </div>
-                {% endfor %}
+                <div class="product-option">
+                    <input type="checkbox" id="product-{{ product.id }}" name="items[]" value="{{ product.variants.first.id }}">
+                    <label for="product-{{ product.id }}">
+                        <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
+                        <p>{{ product.title }}</p>
+                    </label>
+                </div>
             {% endfor %}
         </div>
         <button type="button" id="add-to-cart" class="add-to-cart-button">Add to Cart</button>
@@ -58,9 +56,9 @@
         }
     
         /**
-         * Validate if selected variants are valid
+         * Validate if selected products are valid
          */
-        function validateSelectedVariants(selectedProducts) {
+        function validateSelectedProducts(selectedProducts) {
             if (selectedProducts.length === 0) {
                 alert("Please select at least one product to add to your gift box.");
                 return false;
@@ -83,7 +81,7 @@
             // Collect selected products
             const selectedProducts = document.querySelectorAll('input[name="items[]"]:checked');
     
-            if (!validateSelectedVariants(selectedProducts)) return;
+            if (!validateSelectedProducts(selectedProducts)) return;
     
             // Prepare the items array for Shopify
             const items = [
