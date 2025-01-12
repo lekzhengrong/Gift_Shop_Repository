@@ -16,11 +16,11 @@
       <div class="box-options">
           {% for product in collections['gift-boxes'].products %}
               <div class="box-option">
-                  <input type="radio" id="box-{{ product.id }}" name="box_id" value="{{ product.id }}" required>
-                  <label for="box-{{ product.id }}">
-                      <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-                      <p>{{ product.title }}</p>
-                  </label>
+                    <input type="radio" id="box-{{ product.variants.first.id }}" name="box_id" value="{{ product.variants.first.id }}" required>
+                    <label for="box-{{ product.variants.first.id }}">
+                     <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
+                     <p>{{ product.title }}</p>
+                    </label>
               </div>
           {% endfor %}
       </div>
@@ -40,6 +40,7 @@
 
           // Redirect to the next page with the box_id
           window.location.href = `/pages/gift-product?box_id=${boxId}`;
+          
       });
 
       </script>
