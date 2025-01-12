@@ -49,29 +49,28 @@
     <script>
         const cart = {};
 
-        // Update the quantity display for a product
         function updateQuantityDisplay(productId, quantity) {
             const display = document.querySelector(`.quantity-display[data-id="${productId}"]`);
             if (display) display.textContent = quantity;
         }
 
-        // Add an item to the cart
-        function addToCart(productId, title, price, image) {
+        function addToCart(productId, title, price, image, quantity) {
+            if (quantity <= 0) return;
+
             if (!cart[productId]) {
-                cart[productId] = { title, price, quantity: 1, image };
+                cart[productId] = { title, price, quantity, image };
             } else {
-                cart[productId].quantity += 1;
+                cart[productId].quantity += quantity;
             }
             updateStickyCart();
+            updateQuantityDisplay(productId, 0); // Reset the display after adding
         }
 
-        // Remove an item from the cart
         function removeFromCart(productId) {
             delete cart[productId];
             updateStickyCart();
         }
 
-        // Update the sticky cart UI
         function updateStickyCart() {
             const cartItemsContainer = document.getElementById('cart-items');
             cartItemsContainer.innerHTML = '';
@@ -100,29 +99,20 @@
             document.getElementById('cart-total').textContent = total.toFixed(2);
         }
 
-        // Event listeners
         document.addEventListener('click', (event) => {
             const { target } = event;
 
             if (target.classList.contains('decrease-quantity')) {
                 const productId = target.dataset.id;
-                const quantity = Math.max((cart[productId]?.quantity || 0) - 1, 0);
-                if (quantity === 0) {
-                    removeFromCart(productId);
-                } else {
-                    cart[productId].quantity = quantity;
-                    updateStickyCart();
-                }
-                updateQuantityDisplay(productId, quantity);
+                const currentQuantity = parseInt(document.querySelector(`.quantity-display[data-id="${productId}"]`).textContent, 10);
+                const newQuantity = Math.max(currentQuantity - 1, 0);
+                updateQuantityDisplay(productId, newQuantity);
             }
 
             if (target.classList.contains('increase-quantity')) {
                 const productId = target.dataset.id;
-                const quantity = (cart[productId]?.quantity || 0) + 1;
-                cart[productId] = cart[productId] || { title: '', price: 0, quantity, image: '' };
-                cart[productId].quantity = quantity;
-                updateStickyCart();
-                updateQuantityDisplay(productId, quantity);
+                const currentQuantity = parseInt(document.querySelector(`.quantity-display[data-id="${productId}"]`).textContent, 10);
+                updateQuantityDisplay(productId, currentQuantity + 1);
             }
 
             if (target.classList.contains('add-to-box')) {
@@ -130,14 +120,19 @@
                 const title = target.dataset.title;
                 const price = parseFloat(target.dataset.price);
                 const image = target.dataset.image;
+                const quantity = parseInt(document.querySelector(`.quantity-display[data-id="${productId}"]`).textContent, 10);
 
-                addToCart(productId, title, price, image);
+                addToCart(productId, title, price, image, quantity);
             }
 
             if (target.classList.contains('remove-cart-item')) {
                 const productId = target.dataset.id;
                 removeFromCart(productId);
             }
+        });
+
+        document.getElementById('checkout-button').addEventListener('click', () => {
+            window.location.href = '/checkout';
         });
     </script>
 </body>
