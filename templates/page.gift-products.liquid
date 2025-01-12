@@ -5,20 +5,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Build Your Gift Box - Step 2</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; }
-        .product-options { display: flex; gap: 20px; flex-wrap: wrap; padding: 20px; width: 70%; }
-        .product-option { text-align: center; width: 150px; }
-        .product-option img { width: 150px; height: auto; }
-        .quantity-controls { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
-        .quantity-controls button { width: 30px; height: 30px; font-size: 16px; }
-        .sticky-cart { width: 30%; background: #f9f9f9; position: sticky; top: 0; padding: 20px; border-left: 1px solid #ccc; }
-        .sticky-cart h3 { margin-top: 0; }
-        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .cart-item img { width: 50px; height: auto; }
-        .cart-item-controls { display: flex; gap: 10px; align-items: center; }
-        .cart-item-controls button { width: 30px; height: 30px; font-size: 16px; }
-        .cart-summary { margin-top: 20px; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+        .product-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4 items per row */
+            gap: 20px;
+            padding: 20px;
+            width: 70%;
+        }
+        .product-option {
+            text-align: center;
+        }
+        .product-option img {
+            width: 150px;
+            height: auto;
+        }
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .quantity-controls button {
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+        }
+        .sticky-cart {
+            width: 30%;
+            background: #f9f9f9;
+            position: sticky;
+            top: 0;
+            padding: 20px;
+            border-left: 1px solid #ccc;
+        }
+        .sticky-cart h3 {
+            margin-top: 0;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .cart-item img {
+            width: 50px;
+            height: auto;
+        }
+        .cart-item-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .cart-item-controls button {
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+        }
+        .cart-summary {
+            margin-top: 20px;
+        }
     </style>
+    
 </head>
 <body>
     <div class="product-options">
