@@ -3,191 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Build Your Gift Box - Step 2</title>
+    <title>Select Gift Products</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-        }
-        .product-options {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr); /* 4 items per row */
-            gap: 20px;
-            padding: 20px;
-            width: 70%;
-        }
-        .product-option {
-            text-align: center;
-        }
-        .product-option img {
-            width: 150px;
-            height: auto;
-        }
-        .quantity-controls {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .quantity-controls button {
-            width: 30px;
-            height: 30px;
-            font-size: 16px;
-        }
-        .sticky-cart {
-            width: 30%;
-            background: #f9f9f9;
-            position: sticky;
-            top: 0;
-            padding: 20px;
-            border-left: 1px solid #ccc;
-        }
-        .sticky-cart h3 {
-            margin-top: 0;
-        }
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .cart-item img {
-            width: 50px;
-            height: auto;
-        }
-        .cart-item-controls {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        .cart-item-controls button {
-            width: 30px;
-            height: 30px;
-            font-size: 16px;
-        }
-        .cart-summary {
-            margin-top: 20px;
-        }
+        .product-options { display: flex; gap: 20px; flex-wrap: wrap; }
+        .product-option { text-align: center; width: 150px; }
+        .product-option img { width: 150px; height: auto; }
     </style>
-    
 </head>
 <body>
-    <div class="product-options">
-        {% for product in collections['gift-products'].products %}
-            <div class="product-option">
-                <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-                <p>{{ product.title }}</p>
-                <p>${{ product.price | divided_by: 100 }}</p>
-                <div class="quantity-controls">
-                    <button type="button" class="decrease-quantity" data-id="{{ product.variants.first.id }}">-</button>
-                    <span class="quantity-display" data-id="{{ product.variants.first.id }}">0</span>
-                    <button type="button" class="increase-quantity" data-id="{{ product.variants.first.id }}">+</button>
-                </div>
-                <button type="button" class="add-to-box" data-id="{{ product.variants.first.id }}" data-title="{{ product.title }}" data-price="{{ product.price | divided_by: 100 }}" data-image="{{ product.featured_image | img_url: 'medium' }}">Add to Box</button>
-            </div>
-        {% endfor %}
-    </div>
+    <h2>Step 2: Choose Products for Your Gift Box</h2>
+    <form id="gift-selection-form">
+        <!-- Hidden input for the selected gift box -->
+        <input type="hidden" name="box_id" id="box-id" value="">
 
-    <div class="sticky-cart">
-        <h3>Your Gift</h3>
-        <div id="cart-items"></div>
-        <div class="cart-summary">
-            <p><strong>Total:</strong> $<span id="cart-total">0.00</span></p>
-            <button type="button" id="checkout-button">Checkout</button>
+        <div class="product-options">
+            {% for product in collections['gift-products'].products %}
+                <div class="product-option">
+                    <input 
+                        type="checkbox" 
+                        id="product-{{ product.id }}" 
+                        name="items[]" 
+                        value="{{ product.variants.first.id }}"> <!-- Correct Shopify variant ID -->
+                    <label for="product-{{ product.id }}">
+                        <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
+                        <p>{{ product.title }}</p>
+                    </label>
+                </div>
+            {% endfor %}
         </div>
-    </div>
+        
+        <button type="button" id="add-to-cart" class="add-to-cart-button">Add to Cart</button>
+    </form>
 
     <script>
-        const cart = {};
-
-        function updateQuantityDisplay(productId, quantity) {
-            const display = document.querySelector(`.quantity-display[data-id="${productId}"]`);
-            if (display) display.textContent = quantity;
+        /**
+         * Extract query parameters from the URL
+         */
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
         }
 
-        function addToCart(productId, title, price, image, quantity) {
-            if (quantity <= 0) return;
+        /**
+         * Initialize Step 2 by setting the hidden input with the box_id
+         */
+        function initializeStep2() {
+            const boxId = getQueryParam("box_id");
+            console.log("Box ID from URL:", boxId); // Debugging
 
-            if (!cart[productId]) {
-                cart[productId] = { title, price, quantity, image };
-            } else {
-                cart[productId].quantity += quantity;
+            if (!boxId) {
+                alert("No gift box selected. Please return to the previous page.");
+                window.location.href = "/pages/gift-boxes"; // Redirect to Step 1
+                return;
             }
-            updateStickyCart();
-            updateQuantityDisplay(productId, 0); // Reset the display after adding
+
+            // Set the box_id in the hidden input
+            document.getElementById("box-id").value = boxId;
         }
 
-        function removeFromCart(productId) {
-            delete cart[productId];
-            updateStickyCart();
+        /**
+         * Validate if selected products are valid
+         */
+        function validateSelectedProducts(selectedProducts) {
+            console.log("Selected products for validation:", selectedProducts); // Debugging
+            if (selectedProducts.length === 0) {
+                alert("Please select at least one product to add to your gift box.");
+                return false;
+            }
+            return true;
         }
 
-        function updateStickyCart() {
-            const cartItemsContainer = document.getElementById('cart-items');
-            cartItemsContainer.innerHTML = '';
-            let total = 0;
+        /**
+         * Add selected products and gift box to the cart
+         */
+        async function addToCart() {
+            console.log("Add to Cart button clicked!"); // Debugging
 
-            Object.keys(cart).forEach(productId => {
-                const { title, price, quantity, image } = cart[productId];
-                total += price * quantity;
+            const boxId = document.getElementById("box-id").value;
 
-                const cartItem = document.createElement('div');
-                cartItem.className = 'cart-item';
-                cartItem.innerHTML = `
-                    <img src="${image}" alt="${title}">
-                    <div>${title}</div>
-                    <div class="cart-item-controls">
-                        <button type="button" class="decrease-cart-quantity" data-id="${productId}">-</button>
-                        <span>${quantity}</span>
-                        <button type="button" class="increase-cart-quantity" data-id="${productId}">+</button>
-                        <button type="button" class="remove-cart-item" data-id="${productId}">x</button>
-                    </div>
-                    <div>$${(price * quantity).toFixed(2)}</div>
-                `;
-                cartItemsContainer.appendChild(cartItem);
-            });
+            if (!boxId) {
+                alert("No gift box selected. Please return to the previous page.");
+                return;
+            }
 
-            document.getElementById('cart-total').textContent = total.toFixed(2);
+            // Collect selected products
+            const selectedProducts = document.querySelectorAll('input[name="items[]"]:checked');
+
+            // Log selected product IDs for debugging
+            const selectedProductIds = Array.from(selectedProducts).map(product => product.value);
+            console.log("Selected Product IDs:", selectedProductIds);
+
+            if (!validateSelectedProducts(selectedProducts)) return;
+
+            // Prepare the items array for Shopify
+            const items = [
+                { id: parseInt(boxId, 10), quantity: 1 }, // Add the gift box
+                ...selectedProductIds.map(id => ({
+                    id: parseInt(id, 10), // Use correct variant ID
+                    quantity: 1,
+                })),
+            ];
+
+            console.log("Items to be added to cart:", items); // Debugging
+
+            try {
+                const response = await fetch("/cart/add.js", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ items }),
+                });
+
+                if (response.ok) {
+                    console.log("Items added to cart successfully!"); // Debugging
+                    window.location.href = "/cart"; // Redirect on success
+                } else {
+                    const error = await response.json();
+                    console.error("Error adding items to cart:", error);
+                    alert(`An error occurred while adding items to the cart: ${error.description || "Unknown error"}`);
+                }
+            } catch (error) {
+                console.error("Network error:", error);
+                alert("An error occurred. Please check your connection and try again.");
+            }
         }
 
-        document.addEventListener('click', (event) => {
-            const { target } = event;
+        // Initialize Step 2 on page load
+        document.addEventListener("DOMContentLoaded", initializeStep2);
 
-            if (target.classList.contains('decrease-quantity')) {
-                const productId = target.dataset.id;
-                const currentQuantity = parseInt(document.querySelector(`.quantity-display[data-id="${productId}"]`).textContent, 10);
-                const newQuantity = Math.max(currentQuantity - 1, 0);
-                updateQuantityDisplay(productId, newQuantity);
-            }
-
-            if (target.classList.contains('increase-quantity')) {
-                const productId = target.dataset.id;
-                const currentQuantity = parseInt(document.querySelector(`.quantity-display[data-id="${productId}"]`).textContent, 10);
-                updateQuantityDisplay(productId, currentQuantity + 1);
-            }
-
-            if (target.classList.contains('add-to-box')) {
-                const productId = target.dataset.id;
-                const title = target.dataset.title;
-                const price = parseFloat(target.dataset.price);
-                const image = target.dataset.image;
-                const quantity = parseInt(document.querySelector(`.quantity-display[data-id="${productId}"]`).textContent, 10);
-
-                addToCart(productId, title, price, image, quantity);
-            }
-
-            if (target.classList.contains('remove-cart-item')) {
-                const productId = target.dataset.id;
-                removeFromCart(productId);
-            }
-        });
-
-        document.getElementById('checkout-button').addEventListener('click', () => {
-            window.location.href = '/checkout';
-        });
+        // Attach event listener to the Add to Cart button
+        document.getElementById("add-to-cart").addEventListener("click", addToCart);
     </script>
 </body>
 </html>
