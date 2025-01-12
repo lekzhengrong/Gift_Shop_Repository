@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select Gift Products</title>
+    <title>Zach Theme Store</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; }
-        .product-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 20px; width: 70%; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        .header { text-align: center; padding: 20px; background-color: #f9f9f9; }
+        .menu { display: flex; justify-content: center; background-color: #333; padding: 10px; }
+        .menu a { color: white; text-decoration: none; margin: 0 15px; }
+        .product-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 20px; }
         .product-option { text-align: center; }
         .product-option img { width: 150px; height: auto; }
         .quantity-controls { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
@@ -21,6 +24,18 @@
     </style>
 </head>
 <body>
+    <div class="header">
+        <h1>Welcome to our store</h1>
+    </div>
+
+    <div class="menu">
+        <a href="#">Home</a>
+        <a href="#">Catalog</a>
+        <a href="#">Blog</a>
+        <a href="#">Collection</a>
+        <a href="#">Contact Us</a>
+    </div>
+
     <div class="product-options">
         {% for product in collections['gift-products'].products %}
             <div class="product-option">
