@@ -42,7 +42,10 @@
             margin: 10px auto;
         }
         .product-details {
-            margin-top: 10px;
+            margin-top: 15px;
+        }
+        .product-details p {
+            margin: 5px 0;
         }
         .sticky-cart {
             width: 30%;
@@ -85,12 +88,12 @@
         {% for product in collections['gift-products'].products %}
             <div class="product-option">
                 <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
+                <button type="button" class="add-to-box" data-id="{{ product.variants.first.id }}" data-title="{{ product.title }}" data-price="{{ product.price | divided_by: 100 }}" data-image="{{ product.featured_image | img_url: 'medium' }}">Add to Box</button>
                 <div class="quantity-controls" data-id="{{ product.variants.first.id }}">
                     <button type="button" class="decrease-quantity">-</button>
                     <span class="quantity-display">1</span>
                     <button type="button" class="increase-quantity">+</button>
                 </div>
-                <button type="button" class="add-to-box" data-id="{{ product.variants.first.id }}" data-title="{{ product.title }}" data-price="{{ product.price | divided_by: 100 }}" data-image="{{ product.featured_image | img_url: 'medium' }}">Add to Box</button>
                 <div class="product-details">
                     <p class="product-name">{{ product.title }}</p>
                     <p class="product-price">${{ product.price | divided_by: 100 }}</p>
@@ -107,118 +110,5 @@
             <button type="button" id="checkout-button">Checkout</button>
         </div>
     </div>
-
-    <script>
-        const cart = {};
-
-        function toggleQuantityControls(productId) {
-            const addButton = document.querySelector(`.add-to-box[data-id="${productId}"]`);
-            const quantityControls = document.querySelector(`.quantity-controls[data-id="${productId}"]`);
-            if (addButton && quantityControls) {
-                addButton.style.display = 'none';
-                quantityControls.style.display = 'flex';
-            }
-        }
-
-        function resetQuantityControls(productId) {
-            const addButton = document.querySelector(`.add-to-box[data-id="${productId}"]`);
-            const quantityControls = document.querySelector(`.quantity-controls[data-id="${productId}"]`);
-            if (addButton && quantityControls) {
-                addButton.style.display = 'inline-block';
-                quantityControls.style.display = 'none';
-            }
-        }
-
-        function updateQuantityDisplay(productId, quantity) {
-            const display = document.querySelector(`.quantity-display[data-id="${productId}"]`);
-            if (display) display.textContent = quantity;
-        }
-
-        function addToCart(productId, title, price, image, quantity) {
-            if (quantity <= 0) return;
-
-            if (!cart[productId]) {
-                cart[productId] = { title, price, quantity, image };
-            } else {
-                cart[productId].quantity += quantity;
-            }
-            updateStickyCart();
-        }
-
-        function removeFromCart(productId) {
-            delete cart[productId];
-            updateStickyCart();
-        }
-
-        function updateStickyCart() {
-            const cartItemsContainer = document.getElementById('cart-items');
-            cartItemsContainer.innerHTML = '';
-            let total = 0;
-
-            Object.keys(cart).forEach(productId => {
-                const { title, price, quantity, image } = cart[productId];
-                total += price * quantity;
-
-                const cartItem = document.createElement('div');
-                cartItem.className = 'cart-item';
-                cartItem.innerHTML = `
-                    <img src="${image}" alt="${title}">
-                    <div>${title}</div>
-                    <div class="cart-item-controls">
-                        <button type="button" class="decrease-cart-quantity" data-id="${productId}">-</button>
-                        <span>${quantity}</span>
-                        <button type="button" class="increase-cart-quantity" data-id="${productId}">+</button>
-                        <button type="button" class="remove-cart-item" data-id="${productId}">x</button>
-                    </div>
-                    <div>$${(price * quantity).toFixed(2)}</div>
-                `;
-                cartItemsContainer.appendChild(cartItem);
-            });
-
-            document.getElementById('cart-total').textContent = total.toFixed(2);
-        }
-
-        document.addEventListener('click', (event) => {
-            const { target } = event;
-
-            if (target.classList.contains('add-to-box')) {
-                const productId = target.dataset.id;
-                toggleQuantityControls(productId);
-                addToCart(productId, target.dataset.title, parseFloat(target.dataset.price), target.dataset.image, 1);
-            }
-
-            if (target.classList.contains('decrease-quantity')) {
-                const productId = target.closest('.quantity-controls').dataset.id;
-                const quantityDisplay = target.nextElementSibling;
-                let quantity = parseInt(quantityDisplay.textContent, 10);
-                if (quantity === 1) {
-                    resetQuantityControls(productId);
-                    removeFromCart(productId);
-                } else {
-                    quantity -= 1;
-                    quantityDisplay.textContent = quantity;
-                    addToCart(productId, '', 0, '', -1); // Adjust cart quantity
-                }
-            }
-
-            if (target.classList.contains('increase-quantity')) {
-                const productId = target.closest('.quantity-controls').dataset.id;
-                const quantityDisplay = target.previousElementSibling;
-                let quantity = parseInt(quantityDisplay.textContent, 10);
-                quantity += 1;
-                quantityDisplay.textContent = quantity;
-                addToCart(productId, '', 0, '', 1); // Adjust cart quantity
-            }
-
-            if (target.classList.contains('remove-cart-item')) {
-                const productId = target.dataset.id;
-                removeFromCart(productId);
-            }
-        });
-
-        document.getElementById('checkout-button').addEventListener('click', () => {
-            window.location.href = '/checkout';
-        });
-    </script>
 </body>
 </html>
