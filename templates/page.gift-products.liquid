@@ -42,10 +42,7 @@
             margin: 10px auto;
         }
         .product-details {
-            margin-top: 15px;
-        }
-        .product-details p {
-            margin: 5px 0;
+            margin-top: 10px;
         }
         .sticky-cart {
             width: 30%;
@@ -88,12 +85,12 @@
         {% for product in collections['gift-products'].products %}
             <div class="product-option">
                 <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-                <button type="button" class="add-to-box" data-id="{{ product.variants.first.id }}" data-title="{{ product.title }}" data-price="{{ product.price | divided_by: 100 }}" data-image="{{ product.featured_image | img_url: 'medium' }}">Add to Box</button>
                 <div class="quantity-controls" data-id="{{ product.variants.first.id }}">
                     <button type="button" class="decrease-quantity">-</button>
                     <span class="quantity-display">1</span>
                     <button type="button" class="increase-quantity">+</button>
                 </div>
+                <button type="button" class="add-to-box" data-id="{{ product.variants.first.id }}" data-title="{{ product.title }}" data-price="{{ product.price | divided_by: 100 }}" data-image="{{ product.featured_image | img_url: 'medium' }}">Add to Box</button>
                 <div class="product-details">
                     <p class="product-name">{{ product.title }}</p>
                     <p class="product-price">${{ product.price | divided_by: 100 }}</p>
@@ -115,8 +112,8 @@
         const cart = {};
 
         function toggleQuantityControls(productId) {
-            const addButton = document.querySelector(.add-to-box[data-id="${productId}"]);
-            const quantityControls = document.querySelector(.quantity-controls[data-id="${productId}"]);
+            const addButton = document.querySelector(`.add-to-box[data-id="${productId}"]`);
+            const quantityControls = document.querySelector(`.quantity-controls[data-id="${productId}"]`);
             if (addButton && quantityControls) {
                 addButton.style.display = 'none';
                 quantityControls.style.display = 'flex';
@@ -124,8 +121,8 @@
         }
 
         function resetQuantityControls(productId) {
-            const addButton = document.querySelector(.add-to-box[data-id="${productId}"]);
-            const quantityControls = document.querySelector(.quantity-controls[data-id="${productId}"]);
+            const addButton = document.querySelector(`.add-to-box[data-id="${productId}"]`);
+            const quantityControls = document.querySelector(`.quantity-controls[data-id="${productId}"]`);
             if (addButton && quantityControls) {
                 addButton.style.display = 'inline-block';
                 quantityControls.style.display = 'none';
@@ -133,7 +130,7 @@
         }
 
         function updateQuantityDisplay(productId, quantity) {
-            const display = document.querySelector(.quantity-display[data-id="${productId}"]);
+            const display = document.querySelector(`.quantity-display[data-id="${productId}"]`);
             if (display) display.textContent = quantity;
         }
 
@@ -164,7 +161,7 @@
 
                 const cartItem = document.createElement('div');
                 cartItem.className = 'cart-item';
-                cartItem.innerHTML = 
+                cartItem.innerHTML = `
                     <img src="${image}" alt="${title}">
                     <div>${title}</div>
                     <div class="cart-item-controls">
@@ -174,7 +171,7 @@
                         <button type="button" class="remove-cart-item" data-id="${productId}">x</button>
                     </div>
                     <div>$${(price * quantity).toFixed(2)}</div>
-                ;
+                `;
                 cartItemsContainer.appendChild(cartItem);
             });
 
