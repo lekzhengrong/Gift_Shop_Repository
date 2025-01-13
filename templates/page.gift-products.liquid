@@ -5,23 +5,79 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zach Theme Store</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        .product-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 20px; }
-        .product-option { text-align: center; }
-        .product-option img { width: 150px; height: auto; }
-        .product-option button.add-to-box { display: block; margin: 10px auto 0; }
-        .product-details { display: flex; justify-content: space-between; margin-top: 5px; padding: 0 10px; }
-        .product-details .product-name { text-align: left; }
-        .product-details .product-price { text-align: right; }
-        .quantity-controls { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
-        .quantity-controls button { width: 30px; height: 30px; font-size: 16px; }
-        .sticky-cart { width: 30%; background: #f9f9f9; position: sticky; top: 0; padding: 20px; border-left: 1px solid #ccc; }
-        .sticky-cart h3 { margin-top: 0; }
-        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .cart-item img { width: 50px; height: auto; }
-        .cart-item-controls { display: flex; gap: 10px; align-items: center; }
-        .cart-item-controls button { width: 30px; height: 30px; font-size: 16px; }
-        .cart-summary { margin-top: 20px; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .product-options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            padding: 20px;
+        }
+        .product-option {
+            flex: 0 0 20%;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .product-option img {
+            width: 100%;
+            height: auto;
+        }
+        .product-option button.add-to-box {
+            display: block;
+            margin: 10px auto 0;
+        }
+        .product-details {
+            margin-top: 10px;
+        }
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .quantity-controls button {
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+        }
+        .sticky-cart {
+            width: 30%;
+            background: #f9f9f9;
+            position: sticky;
+            top: 0;
+            padding: 20px;
+            border-left: 1px solid #ccc;
+        }
+        .sticky-cart h3 {
+            margin-top: 0;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .cart-item img {
+            width: 50px;
+            height: auto;
+        }
+        .cart-item-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .cart-item-controls button {
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+        }
+        .cart-summary {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -29,15 +85,15 @@
         {% for product in collections['gift-products'].products %}
             <div class="product-option">
                 <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-                <button type="button" class="add-to-box" data-id="{{ product.variants.first.id }}" data-title="{{ product.title }}" data-price="{{ product.price | divided_by: 100 }}" data-image="{{ product.featured_image | img_url: 'medium' }}">Add to Box</button>
-                <div class="product-details">
-                    <p class="product-name">{{ product.title }}</p>
-                    <p class="product-price">${{ product.price | divided_by: 100 }}</p>
-                </div>
                 <div class="quantity-controls" data-id="{{ product.variants.first.id }}" style="display: none;">
                     <button type="button" class="decrease-quantity">-</button>
                     <span class="quantity-display">1</span>
                     <button type="button" class="increase-quantity">+</button>
+                </div>
+                <button type="button" class="add-to-box" data-id="{{ product.variants.first.id }}" data-title="{{ product.title }}" data-price="{{ product.price | divided_by: 100 }}" data-image="{{ product.featured_image | img_url: 'medium' }}">Add to Box</button>
+                <div class="product-details">
+                    <p class="product-name">{{ product.title }}</p>
+                    <p class="product-price">${{ product.price | divided_by: 100 }}</p>
                 </div>
             </div>
         {% endfor %}
@@ -53,6 +109,7 @@
     </div>
 
     <script>
+        
         const cart = {};
 
         function toggleQuantityControls(productId) {
@@ -166,3 +223,4 @@
     </script>
 </body>
 </html>
+
