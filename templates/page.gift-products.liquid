@@ -9,6 +9,10 @@
         .product-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 20px; }
         .product-option { text-align: center; }
         .product-option img { width: 150px; height: auto; }
+        .product-option button.add-to-box { display: block; margin: 10px auto 0; }
+        .product-details { display: flex; justify-content: space-between; margin-top: 5px; padding: 0 10px; }
+        .product-details .product-name { text-align: left; }
+        .product-details .product-price { text-align: right; }
         .quantity-controls { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
         .quantity-controls button { width: 30px; height: 30px; font-size: 16px; }
         .sticky-cart { width: 30%; background: #f9f9f9; position: sticky; top: 0; padding: 20px; border-left: 1px solid #ccc; }
@@ -25,14 +29,16 @@
         {% for product in collections['gift-products'].products %}
             <div class="product-option">
                 <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-                <p>{{ product.title }}</p>
-                <p>${{ product.price | divided_by: 100 }}</p>
+                <button type="button" class="add-to-box" data-id="{{ product.variants.first.id }}" data-title="{{ product.title }}" data-price="{{ product.price | divided_by: 100 }}" data-image="{{ product.featured_image | img_url: 'medium' }}">Add to Box</button>
+                <div class="product-details">
+                    <p class="product-name">{{ product.title }}</p>
+                    <p class="product-price">${{ product.price | divided_by: 100 }}</p>
+                </div>
                 <div class="quantity-controls" data-id="{{ product.variants.first.id }}" style="display: none;">
                     <button type="button" class="decrease-quantity">-</button>
                     <span class="quantity-display">1</span>
                     <button type="button" class="increase-quantity">+</button>
                 </div>
-                <button type="button" class="add-to-box" data-id="{{ product.variants.first.id }}" data-title="{{ product.title }}" data-price="{{ product.price | divided_by: 100 }}" data-image="{{ product.featured_image | img_url: 'medium' }}">Add to Box</button>
             </div>
         {% endfor %}
     </div>
