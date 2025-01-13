@@ -25,24 +25,24 @@
             width: 100%;
             height: auto;
         }
-        .product-option button.add-to-box {
-            display: block;
-            margin: 10px auto 0;
-        }
-        .product-details {
-            margin-top: 10px;
-        }
         .quantity-controls {
-            display: flex;
-            align-items: center;
+            display: none;
             justify-content: center;
+            align-items: center;
             gap: 10px;
-            margin-top: 10px;
+            margin: 10px 0;
         }
         .quantity-controls button {
             width: 30px;
             height: 30px;
             font-size: 16px;
+        }
+        .product-option button.add-to-box {
+            display: block;
+            margin: 10px auto;
+        }
+        .product-details {
+            margin-top: 10px;
         }
         .sticky-cart {
             width: 30%;
@@ -85,7 +85,7 @@
         {% for product in collections['gift-products'].products %}
             <div class="product-option">
                 <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-                <div class="quantity-controls" data-id="{{ product.variants.first.id }}" style="display: none;">
+                <div class="quantity-controls" data-id="{{ product.variants.first.id }}">
                     <button type="button" class="decrease-quantity">-</button>
                     <span class="quantity-display">1</span>
                     <button type="button" class="increase-quantity">+</button>
@@ -109,7 +109,6 @@
     </div>
 
     <script>
-        
         const cart = {};
 
         function toggleQuantityControls(productId) {
@@ -223,4 +222,3 @@
     </script>
 </body>
 </html>
-
