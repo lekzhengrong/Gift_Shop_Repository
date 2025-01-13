@@ -20,6 +20,7 @@
             flex: 0 0 20%;
             box-sizing: border-box;
             text-align: center;
+            position: relative;
         }
         .product-option img {
             width: 100%;
@@ -124,7 +125,7 @@
             const addButton = document.querySelector(`.add-to-box[data-id="${productId}"]`);
             const quantityControls = document.querySelector(`.quantity-controls[data-id="${productId}"]`);
             if (addButton && quantityControls) {
-                addButton.style.display = 'inline-block';
+                addButton.style.display = 'block';
                 quantityControls.style.display = 'none';
             }
         }
@@ -161,8 +162,8 @@
 
                 const cartItem = document.createElement('div');
                 cartItem.className = 'cart-item';
-                cartItem.innerHTML = `
-                    <img src="${image}" alt="${title}">
+                cartItem.innerHTML = 
+                    `<img src="${image}" alt="${title}">
                     <div>${title}</div>
                     <div class="cart-item-controls">
                         <button type="button" class="decrease-cart-quantity" data-id="${productId}">-</button>
@@ -170,8 +171,7 @@
                         <button type="button" class="increase-cart-quantity" data-id="${productId}">+</button>
                         <button type="button" class="remove-cart-item" data-id="${productId}">x</button>
                     </div>
-                    <div>$${(price * quantity).toFixed(2)}</div>
-                `;
+                    <div>$${(price * quantity).toFixed(2)}</div>`;
                 cartItemsContainer.appendChild(cartItem);
             });
 
@@ -222,3 +222,4 @@
     </script>
 </body>
 </html>
+``
