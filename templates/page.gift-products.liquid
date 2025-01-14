@@ -46,13 +46,24 @@
             margin-top: 10px;
         }
         .sticky-cart {
-            width: 30%;
-            background: #f9f9f9;
-            position: sticky;
-            top: 0;
+            position: fixed; /* Keeps it fixed as the user scrolls */
+            top: 50%;        /* Center vertically */
+            right: 20px;     /* Adjust distance from the right edge */
+            transform: translateY(-50%); /* Center the cart vertically */
+            width: 300px;    /* Adjust width as needed */
             padding: 20px;
-            border-left: 1px solid #ccc;
+            background-color: #fff; /* Background color */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a shadow for a floating effect */
+            z-index: 1000;   /* Ensure it appears on top of other elements */
+            border-radius: 8px; /* Optional: rounded corners */
         }
+
+        @media (max-width: 768px) {
+     .sticky-cart {
+        width: 80%; /* Adjust width on smaller screens */
+        right: 10px; /* Closer to the right edge */
+     }
+    }
         .sticky-cart h3 {
             margin-top: 0;
         }
@@ -222,4 +233,3 @@
     </script>
 </body>
 </html>
-``
