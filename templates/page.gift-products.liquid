@@ -9,23 +9,34 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-        }
-        .product-options {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            padding: 20px;
+            flex-direction: row; /* Ensures the layout accommodates the sticky cart on the side */
         }
+
+        .product-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4 products per row */
+            gap: 20px;
+            padding: 20px;
+            flex: 1; /* Allow this section to take up remaining space */
+        }
+
         .product-option {
-            flex: 0 0 20%;
             box-sizing: border-box;
             text-align: center;
             position: relative;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
         }
+
         .product-option img {
             width: 100%;
             height: auto;
+            border-radius: 8px;
         }
+
         .quantity-controls {
             display: none;
             justify-content: center;
@@ -33,62 +44,82 @@
             gap: 10px;
             margin: 10px 0;
         }
+
         .quantity-controls button {
             width: 30px;
             height: 30px;
             font-size: 16px;
         }
+
         .product-option button.add-to-box {
-            display: block;
             margin: 10px auto;
+            display: block;
+            background-color: #000;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
         }
+
         .product-details {
             margin-top: 10px;
         }
+
         .sticky-cart {
-            position: fixed; /* Keeps it fixed as the user scrolls */
-            top: 50%;        /* Center vertically */
-            right: 20px;     /* Adjust distance from the right edge */
-            transform: translateY(-50%); /* Center the cart vertically */
-            width: 300px;    /* Adjust width as needed */
+            position: sticky;
+            top: 20px;
+            width: 300px;
             padding: 20px;
-            background-color: #fff; /* Background color */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a shadow for a floating effect */
-            z-index: 1000;   /* Ensure it appears on top of other elements */
-            border-radius: 8px; /* Optional: rounded corners */
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            border-radius: 8px;
+            flex-shrink: 0; /* Prevent shrinking */
         }
 
-        @media (max-width: 768px) {
-     .sticky-cart {
-        width: 80%; /* Adjust width on smaller screens */
-        right: 10px; /* Closer to the right edge */
-     }
-    }
         .sticky-cart h3 {
             margin-top: 0;
         }
+
         .cart-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
         }
+
         .cart-item img {
             width: 50px;
             height: auto;
         }
+
         .cart-item-controls {
             display: flex;
             gap: 10px;
             align-items: center;
         }
+
         .cart-item-controls button {
             width: 30px;
             height: 30px;
             font-size: 16px;
         }
+
         .cart-summary {
             margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .product-options {
+                grid-template-columns: repeat(2, 1fr); /* Adjust to 2 products per row on smaller screens */
+            }
+
+            .sticky-cart {
+                width: 100%; /* Full width for sticky cart on small screens */
+                position: static; /* Move to static for better usability */
+                margin-top: 20px;
+            }
         }
     </style>
 </head>
@@ -99,7 +130,7 @@
                 <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
                 <div class="quantity-controls" data-id="{{ product.variants.first.id }}">
                     <button type="button" class="decrease-quantity">-</button>
-                    <span class="quantity-display">1</span>
+                    <span class="quantity-display" data-id="{{ product.variants.first.id }}">1</span>
                     <button type="button" class="increase-quantity">+</button>
                 </div>
                 <button type="button" class="add-to-box" data-id="{{ product.variants.first.id }}" data-title="{{ product.title }}" data-price="{{ product.price | divided_by: 100 }}" data-image="{{ product.featured_image | img_url: 'medium' }}">Add to Box</button>
@@ -141,12 +172,7 @@
             }
         }
 
-        function updateQuantityDisplay(productId, quantity) {
-            const display = document.querySelector(`.quantity-display[data-id="${productId}"]`);
-            if (display) display.textContent = quantity;
-        }
-
-        function addToCart(productId, title, price, image, quantity) {
+        function addToCart(productId, title, price, image, quantity = 1) {
             if (quantity <= 0) return;
 
             if (!cart[productId]) {
@@ -154,11 +180,6 @@
             } else {
                 cart[productId].quantity += quantity;
             }
-            updateStickyCart();
-        }
-
-        function removeFromCart(productId) {
-            delete cart[productId];
             updateStickyCart();
         }
 
@@ -173,8 +194,8 @@
 
                 const cartItem = document.createElement('div');
                 cartItem.className = 'cart-item';
-                cartItem.innerHTML = 
-                    `<img src="${image}" alt="${title}">
+                cartItem.innerHTML = `
+                    <img src="${image}" alt="${title}">
                     <div>${title}</div>
                     <div class="cart-item-controls">
                         <button type="button" class="decrease-cart-quantity" data-id="${productId}">-</button>
@@ -182,7 +203,8 @@
                         <button type="button" class="increase-cart-quantity" data-id="${productId}">+</button>
                         <button type="button" class="remove-cart-item" data-id="${productId}">x</button>
                     </div>
-                    <div>$${(price * quantity).toFixed(2)}</div>`;
+                    <div>$${(price * quantity).toFixed(2)}</div>
+                `;
                 cartItemsContainer.appendChild(cartItem);
             });
 
@@ -195,40 +217,38 @@
             if (target.classList.contains('add-to-box')) {
                 const productId = target.dataset.id;
                 toggleQuantityControls(productId);
-                addToCart(productId, target.dataset.title, parseFloat(target.dataset.price), target.dataset.image, 1);
+                addToCart(productId, target.dataset.title, parseFloat(target.dataset.price), target.dataset.image);
             }
 
             if (target.classList.contains('decrease-quantity')) {
                 const productId = target.closest('.quantity-controls').dataset.id;
-                const quantityDisplay = target.nextElementSibling;
-                let quantity = parseInt(quantityDisplay.textContent, 10);
+                const display = target.nextElementSibling;
+                const quantity = parseInt(display.textContent, 10);
                 if (quantity === 1) {
                     resetQuantityControls(productId);
-                    removeFromCart(productId);
                 } else {
-                    quantity -= 1;
-                    quantityDisplay.textContent = quantity;
-                    addToCart(productId, '', 0, '', -1); // Adjust cart quantity
+                    display.textContent = quantity - 1;
+                    addToCart(productId, '', 0, '', -1);
                 }
             }
 
             if (target.classList.contains('increase-quantity')) {
                 const productId = target.closest('.quantity-controls').dataset.id;
-                const quantityDisplay = target.previousElementSibling;
-                let quantity = parseInt(quantityDisplay.textContent, 10);
-                quantity += 1;
-                quantityDisplay.textContent = quantity;
-                addToCart(productId, '', 0, '', 1); // Adjust cart quantity
+                const display = target.previousElementSibling;
+                const quantity = parseInt(display.textContent, 10) + 1;
+                display.textContent = quantity;
+                addToCart(productId, '', 0, '', 1);
             }
 
             if (target.classList.contains('remove-cart-item')) {
                 const productId = target.dataset.id;
-                removeFromCart(productId);
+                delete cart[productId];
+                updateStickyCart();
             }
         });
 
         document.getElementById('checkout-button').addEventListener('click', () => {
-            window.location.href = '/checkout';
+            alert('Proceeding to checkout');
         });
     </script>
 </body>
