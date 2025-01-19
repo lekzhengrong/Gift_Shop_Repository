@@ -1,144 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zach Theme Store</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-        }
-
-        .container {
-            display: flex;
-            gap: 20px;
-            padding: 20px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        /* Product options section */
-        .product-options {
-            flex: 1;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-        }
-
-        .product-option {
-            border: 1px solid #eee;
-            padding: 15px;
-            border-radius: 8px;
-        }
-
-        .product-option img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 4px;
-        }
-
-        .quantity-controls {
-            display: none;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin: 10px 0;
-        }
-
-        .quantity-controls button {
-            width: 30px;
-            height: 30px;
-            font-size: 16px;
-            border: 1px solid #ddd;
-            background: #fff;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-
-        .product-details {
-            margin-top: 10px;
-        }
-
-        .product-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .add-to-box {
-            width: 100%;
-            padding: 8px;
-            background: #000;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        /* Sticky cart section */
-        .sticky-cart {
-            width: 300px;
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-            position: sticky;
-            top: 20px;
-            height: calc(100vh - 40px);
-            overflow-y: auto;
-        }
-
-        .cart-item {
-            display: flex;
-            gap: 15px;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .cart-item img {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 4px;
-        }
-
-        .cart-item-info {
-            flex: 1;
-        }
-
-        .cart-item-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 5px;
-        }
-
-        .cart-item-controls button {
-            width: 25px;
-            height: 25px;
-            font-size: 14px;
-            border: 1px solid #ddd;
-            background: #fff;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-
-        #checkout-button {
-            width: 100%;
-            padding: 10px;
-            background: #000;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            margin-top: 20px;
-            cursor: pointer;
-        }
-    </style>
-</head>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Zach Theme Store</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                min-height: 100vh;
+            }
+    
+            .container {
+                display: flex;
+                gap: 20px;
+                padding: 20px;
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+    
+            /* Product options section */
+            .product-options {
+                flex: 1;
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 20px;
+            }
+    
+            .product-option {
+                border: 1px solid #eee;
+                padding: 12px;
+                border-radius: 8px;
+                display: flex;
+                flex-direction: column;
+            }
+    
+            .product-option img {
+                width: 100%;
+                height: 150px; /* Reduced from 200px */
+                object-fit: contain; /* Changed from cover to contain */
+                border-radius: 4px;
+                margin-bottom: 8px;
+            }
+    
+            .quantity-controls {
+                display: none;
+                justify-content: center;
+                align-items: center;
+                gap: 10px;
+                margin: 8px 0;
+            }
+    
+            .quantity-controls button {
+                width: 28px;
+                height: 28px;
+                font-size: 14px;
+                border: 1px solid #ddd;
+                background: #fff;
+                cursor: pointer;
+                border-radius: 4px;
+            }
+    
+            .product-details {
+                margin-top: auto;
+            }
+    
+            .product-info {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 8px;
+                font-size: 0.9rem;
+            }
+    
+            .product-name {
+                font-weight: 500;
+            }
+    
+            .add-to-box {
+                width: 100%;
+                padding: 8px;
+                background: #000;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 0.9rem;
+            }
+    
+            /* Sticky cart section */
+            .sticky-cart {
+                width: 300px;
+                background: #f9f9f9;
+                padding: 20px;
+                border-radius: 8px;
+                position: sticky;
+                top: 20px;
+                height: calc(100vh - 40px);
+                overflow-y: auto;
+            }
+    
+            .cart-item {
+                display: flex;
+                gap: 12px;
+                padding: 8px 0;
+                border-bottom: 1px solid #eee;
+            }
+    
+            .cart-item img {
+                width: 50px;
+                height: 50px;
+                object-fit: contain;
+                border-radius: 4px;
+            }
+    
+            .cart-item-info {
+                flex: 1;
+                font-size: 0.9rem;
+            }
+    
+            .cart-item-controls {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-top: 4px;
+            }
+    
+            .cart-item-controls button {
+                width: 24px;
+                height: 24px;
+                font-size: 14px;
+                border: 1px solid #ddd;
+                background: #fff;
+                cursor: pointer;
+                border-radius: 4px;
+            }
+    
+            #checkout-button {
+                width: 100%;
+                padding: 10px;
+                background: #000;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                margin-top: 20px;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <!-- Rest of the HTML and JavaScript remains exactly the same -->
 <body>
     <div class="container">
         <!-- Product Options -->
