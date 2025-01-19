@@ -277,9 +277,35 @@ function increaseQuantity(productId) {
 }
 
 // Checkout button handler
-document.getElementById('checkout-button').addEventListener('click', function() {
-    // Add your checkout logic here
-    console.log('Proceeding to checkout with items:', cart);
+document.getElementById('checkout-button').addEventListener('click', async function() {
+    const items = Object.entries(cart).map(([id, item]) => ({
+        id: id, // Variant ID
+        quantity: item.quantity
+    }));
+
+    if (items.length === 0) {
+        alert('Your cart is empty. Add some items first!');
+        return;
+    }
+
+    try {
+        // Send the cart data to Shopify's cart API
+        for (let item of items) {
+            await fetch('/cart/add.js', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(item)
+            });
+        }
+
+        // Redirect to Shopify's checkout page
+        window.location.href = '/cart';
+    } catch (error) {
+        console.error('Error proceeding to checkout:', error);
+        alert('There was an issue with checkout. Please try again.');
+    }
 });
     </script>
 </body>
