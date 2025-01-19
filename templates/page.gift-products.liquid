@@ -32,8 +32,7 @@
             border: 1px solid #eee;
             padding: 12px;
             border-radius: 8px;
-            display: flex;
-            flex-direction: column;
+            height: fit-content;
         }
 
         .product-option img {
@@ -42,6 +41,7 @@
             object-fit: cover;
             border-radius: 4px;
             margin-bottom: 8px;
+            display: block;
         }
 
         .quantity-controls {
@@ -82,7 +82,7 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            margin-top: auto;
+            display: block;
         }
 
         /* Sticky cart section */
@@ -145,7 +145,7 @@
     </style>
 </head>
 <body>
-    <!-- Rest of the HTML and JavaScript remains the same -->
+    <!-- Rest of the HTML remains the same -->
     <div class="container">
         <!-- Product Options -->
         <div class="product-options">
@@ -186,7 +186,7 @@
     </div>
 
     <script>
-        const cart = {};
+                const cart = {};
 
 // Add click handlers for all "Add to Box" buttons
 document.querySelectorAll('.add-to-box').forEach(button => {
