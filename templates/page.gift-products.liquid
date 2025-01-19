@@ -30,15 +30,18 @@
 
         .product-option {
             border: 1px solid #eee;
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
+            display: flex;
+            flex-direction: column;
         }
 
         .product-option img {
             width: 100%;
-            height: 200px;
+            height: 180px;
             object-fit: cover;
             border-radius: 4px;
+            margin-bottom: 8px;
         }
 
         .quantity-controls {
@@ -46,13 +49,13 @@
             justify-content: center;
             align-items: center;
             gap: 10px;
-            margin: 10px 0;
+            margin: 8px 0;
         }
 
         .quantity-controls button {
-            width: 30px;
-            height: 30px;
-            font-size: 16px;
+            width: 28px;
+            height: 28px;
+            font-size: 14px;
             border: 1px solid #ddd;
             background: #fff;
             cursor: pointer;
@@ -60,14 +63,15 @@
         }
 
         .product-details {
-            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .product-info {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
         }
 
         .add-to-box {
@@ -78,6 +82,7 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            margin-top: auto;
         }
 
         /* Sticky cart section */
@@ -140,6 +145,7 @@
     </style>
 </head>
 <body>
+    <!-- Rest of the HTML and JavaScript remains the same -->
     <div class="container">
         <!-- Product Options -->
         <div class="product-options">
@@ -182,97 +188,97 @@
     <script>
         const cart = {};
 
-        // Add click handlers for all "Add to Box" buttons
-        document.querySelectorAll('.add-to-box').forEach(button => {
-            button.addEventListener('click', function() {
-                const { id, title, price, image } = this.dataset;
-                addToCart(id, title, parseFloat(price), image, 1);
-                toggleQuantityControls(id);
-            });
-        });
+// Add click handlers for all "Add to Box" buttons
+document.querySelectorAll('.add-to-box').forEach(button => {
+    button.addEventListener('click', function() {
+        const { id, title, price, image } = this.dataset;
+        addToCart(id, title, parseFloat(price), image, 1);
+        toggleQuantityControls(id);
+    });
+});
 
-        // Add click handlers for quantity controls
-        document.querySelectorAll('.quantity-controls').forEach(controls => {
-            const productId = controls.dataset.id;
-            controls.querySelector('.decrease-quantity').addEventListener('click', () => {
-                decreaseQuantity(productId);
-            });
-            controls.querySelector('.increase-quantity').addEventListener('click', () => {
-                increaseQuantity(productId);
-            });
-        });
+// Add click handlers for quantity controls
+document.querySelectorAll('.quantity-controls').forEach(controls => {
+    const productId = controls.dataset.id;
+    controls.querySelector('.decrease-quantity').addEventListener('click', () => {
+        decreaseQuantity(productId);
+    });
+    controls.querySelector('.increase-quantity').addEventListener('click', () => {
+        increaseQuantity(productId);
+    });
+});
 
-        function toggleQuantityControls(productId) {
-            const option = document.querySelector(`.product-option .add-to-box[data-id="${productId}"]`).closest('.product-option');
-            option.querySelector('.add-to-box').style.display = 'none';
-            option.querySelector('.quantity-controls').style.display = 'flex';
-        }
+function toggleQuantityControls(productId) {
+    const option = document.querySelector(`.product-option .add-to-box[data-id="${productId}"]`).closest('.product-option');
+    option.querySelector('.add-to-box').style.display = 'none';
+    option.querySelector('.quantity-controls').style.display = 'flex';
+}
 
-        function resetQuantityControls(productId) {
-            const option = document.querySelector(`.product-option .quantity-controls[data-id="${productId}"]`).closest('.product-option');
-            option.querySelector('.add-to-box').style.display = 'block';
-            option.querySelector('.quantity-controls').style.display = 'none';
-            option.querySelector('.quantity-display').textContent = '1';
-        }
+function resetQuantityControls(productId) {
+    const option = document.querySelector(`.product-option .quantity-controls[data-id="${productId}"]`).closest('.product-option');
+    option.querySelector('.add-to-box').style.display = 'block';
+    option.querySelector('.quantity-controls').style.display = 'none';
+    option.querySelector('.quantity-display').textContent = '1';
+}
 
-        function addToCart(productId, title, price, image, quantity) {
-            if (!cart[productId]) {
-                cart[productId] = { title, price, quantity, image };
-            } else {
-                cart[productId].quantity += quantity;
-            }
-            updateStickyCart();
-        }
+function addToCart(productId, title, price, image, quantity) {
+    if (!cart[productId]) {
+        cart[productId] = { title, price, quantity, image };
+    } else {
+        cart[productId].quantity += quantity;
+    }
+    updateStickyCart();
+}
 
-        function updateStickyCart() {
-            const cartItemsContainer = document.getElementById('cart-items');
-            cartItemsContainer.innerHTML = '';
-            let total = 0;
+function updateStickyCart() {
+    const cartItemsContainer = document.getElementById('cart-items');
+    cartItemsContainer.innerHTML = '';
+    let total = 0;
 
-            Object.entries(cart).forEach(([productId, item]) => {
-                const { title, price, quantity, image } = item;
-                total += price * quantity;
+    Object.entries(cart).forEach(([productId, item]) => {
+        const { title, price, quantity, image } = item;
+        total += price * quantity;
 
-                const cartItem = document.createElement('div');
-                cartItem.className = 'cart-item';
-                cartItem.innerHTML = `
-                    <img src="${image}" alt="${title}">
-                    <div class="cart-item-info">
-                        <div>${title}</div>
-                        <div class="cart-item-controls">
-                            <button onclick="decreaseQuantity('${productId}')">-</button>
-                            <span>${quantity}</span>
-                            <button onclick="increaseQuantity('${productId}')">+</button>
-                        </div>
-                        <div>$${(price * quantity).toFixed(2)}</div>
-                    </div>
-                `;
-                cartItemsContainer.appendChild(cartItem);
-            });
+        const cartItem = document.createElement('div');
+        cartItem.className = 'cart-item';
+        cartItem.innerHTML = `
+            <img src="${image}" alt="${title}">
+            <div class="cart-item-info">
+                <div>${title}</div>
+                <div class="cart-item-controls">
+                    <button onclick="decreaseQuantity('${productId}')">-</button>
+                    <span>${quantity}</span>
+                    <button onclick="increaseQuantity('${productId}')">+</button>
+                </div>
+                <div>$${(price * quantity).toFixed(2)}</div>
+            </div>
+        `;
+        cartItemsContainer.appendChild(cartItem);
+    });
 
-            document.getElementById('cart-total').textContent = total.toFixed(2);
-        }
+    document.getElementById('cart-total').textContent = total.toFixed(2);
+}
 
-        function decreaseQuantity(productId) {
-            if (cart[productId].quantity > 1) {
-                cart[productId].quantity -= 1;
-            } else {
-                delete cart[productId];
-                resetQuantityControls(productId);
-            }
-            updateStickyCart();
-        }
+function decreaseQuantity(productId) {
+    if (cart[productId].quantity > 1) {
+        cart[productId].quantity -= 1;
+    } else {
+        delete cart[productId];
+        resetQuantityControls(productId);
+    }
+    updateStickyCart();
+}
 
-        function increaseQuantity(productId) {
-            cart[productId].quantity += 1;
-            updateStickyCart();
-        }
+function increaseQuantity(productId) {
+    cart[productId].quantity += 1;
+    updateStickyCart();
+}
 
-        // Checkout button handler
-        document.getElementById('checkout-button').addEventListener('click', function() {
-            // Add your checkout logic here
-            console.log('Proceeding to checkout with items:', cart);
-        });
+// Checkout button handler
+document.getElementById('checkout-button').addEventListener('click', function() {
+    // Add your checkout logic here
+    console.log('Proceeding to checkout with items:', cart);
+});
     </script>
 </body>
 </html>
