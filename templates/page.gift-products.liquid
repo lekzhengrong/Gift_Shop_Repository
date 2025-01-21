@@ -26,9 +26,10 @@
             flex: 1;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 2px; /* Reduced from 20px to 12px */
+            gap: 12px; /* Reduced from 20px to 12px */
             row-gap: 12px; /* Explicitly set row gap to match */
-        }
+            grid-auto-rows: min-content;
+        }   
 
         .product-option {
             border: 1px solid #eee;
