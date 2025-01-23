@@ -60,7 +60,7 @@
     <body>
         <h2>Step 3: Add a Gift Card</h2>
         <div class="gift-card-options">
-            {% for product in collections['Gift Cards'].products %}
+            {% for product in collections['gift-cards'].products %}
                 <div class="gift-card-option">
                     <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
                     <p>{{ product.title }}</p>
