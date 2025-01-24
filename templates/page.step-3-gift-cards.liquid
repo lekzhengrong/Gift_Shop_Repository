@@ -63,6 +63,13 @@
                 width: 100%;
                 margin-bottom: 10px;
             }
+
+            .product-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
         </style>
     </head>
     <body>
@@ -72,8 +79,10 @@
                 {% for product in collections['gift-cards'].products %}
                     <div class="gift-card-option">
                         <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-                        <p>{{ product.title }}</p>
-                        <p>{{ product.price | money }}</p>
+                        <div class="product-info">
+                            <span class="product-name">{{ product.title }}</span>
+                            <span class="product-price">${{ product.price | divided_by: 100 }}</span>
+                        </div>
                         <button class="select-design" data-product-id="{{ product.id }}">Select Design</button>
                     </div>
                 {% endfor %}
