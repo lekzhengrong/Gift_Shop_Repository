@@ -6,11 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Step 3: Add a Gift Card</title>
         <style>
-            .gift-card-options { 
-                display: grid; 
-                grid-template-columns: repeat(4, 1fr); 
-                gap: 20px; 
-            }
+
             .gift-card-option { 
                 text-align: center; 
                 border: 1px solid #ccc; 
@@ -69,6 +65,16 @@
             justify-content: space-between;
             align-items: center;
         }
+
+        .gift-card-options {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            row-gap: 12px;
+            grid-auto-rows: min-content;
+        }   
+
 
         </style>
     </head>
