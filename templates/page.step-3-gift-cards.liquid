@@ -15,7 +15,7 @@
             }
             .gift-card-option img { 
                 width: 150px; 
-                height: auto;
+                height: auto; 
             }
             .popup-overlay {
                 position: fixed;
@@ -36,15 +36,7 @@
             max-width: 1400px;
             margin: 0 auto;
         }
-        .close-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            }
-                    .popup {
+            .popup {
                 background: white;
                 padding: 20px;
                 border-radius: 5px;
@@ -114,7 +106,7 @@
 
             <div class="popup-overlay" id="popup-overlay">
                 <div class="popup">
-                    <span class="close-button" id="popup-close">&times;</span>
+                    <span class="close" id="popup-close">&times;</span>
                     <h3>Customize Your Gift Card</h3>
                     <textarea id="gift-message" maxlength="200" placeholder="Enter your message (max 200 characters)"></textarea>
                     <input type="text" id="gift-from" placeholder="From: Your name">
@@ -139,11 +131,6 @@
             const closeBtn = document.getElementById('popup-close');
             const saveBtn = document.getElementById('save-button');
             let selectedProductId = null;
-
-            const closeButton = document.getElementById('close-button');
-            closeButton.addEventListener('click', () => {
-                overlay.style.display = 'none';
-            });
 
             function addToCart(productId, title, price, image, quantity) {
             if (!cart[productId]) {
@@ -198,27 +185,17 @@
             updateStickyCart();
         }
 
-             // Open popup on button click
-             document.querySelectorAll('.select-design').forEach(button => {
+            document.querySelectorAll('.select-design').forEach(button => {
                 button.addEventListener('click', function() {
                     selectedProductId = this.getAttribute('data-product-id');
                     overlay.style.display = 'flex';
                 });
             });
 
-            // Close popup on close button click
             closeBtn.addEventListener('click', function() {
                 overlay.style.display = 'none';
             });
 
-            // Close popup on clicking outside the popup content
-            overlay.addEventListener('click', function(event) {
-                if (event.target === overlay) {
-                    overlay.style.display = 'none';
-                }
-            });
-
-            // Save button logic
             saveBtn.addEventListener('click', function() {
                 const message = document.getElementById('gift-message').value;
                 const fromName = document.getElementById('gift-from').value;
