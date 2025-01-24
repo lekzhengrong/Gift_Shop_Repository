@@ -32,6 +32,14 @@
                 justify-content: center;
                 align-items: center;
             }
+
+            .container {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
             .popup {
                 background: white;
                 padding: 20px;
@@ -58,28 +66,29 @@
         </style>
     </head>
     <body>
-        <h2>Step 3: Add a Gift Card</h2>
-        <div class="gift-card-options">
-            {% for product in collections['gift-cards'].products %}
-                <div class="gift-card-option">
-                    <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-                    <p>{{ product.title }}</p>
-                    <p>{{ product.price | money }}</p>
-                    <button class="select-design" data-product-id="{{ product.id }}">Select Design</button>
-                </div>
-            {% endfor %}
-        </div>
+        <div class="container">
+            <h2>Step 3: Add a Gift Card</h2>
+            <div class="gift-card-options">
+                {% for product in collections['gift-cards'].products %}
+                    <div class="gift-card-option">
+                        <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
+                        <p>{{ product.title }}</p>
+                        <p>{{ product.price | money }}</p>
+                        <button class="select-design" data-product-id="{{ product.id }}">Select Design</button>
+                    </div>
+                {% endfor %}
+            </div>
 
-        <div class="popup-overlay" id="popup-overlay">
-            <div class="popup">
-                <span class="close" id="popup-close">&times;</span>
-                <h3>Customize Your Gift Card</h3>
-                <textarea id="gift-message" maxlength="200" placeholder="Enter your message (max 200 characters)"></textarea>
-                <input type="text" id="gift-from" placeholder="From: Your name">
-                <button id="save-button">Save</button>
+            <div class="popup-overlay" id="popup-overlay">
+                <div class="popup">
+                    <span class="close" id="popup-close">&times;</span>
+                    <h3>Customize Your Gift Card</h3>
+                    <textarea id="gift-message" maxlength="200" placeholder="Enter your message (max 200 characters)"></textarea>
+                    <input type="text" id="gift-from" placeholder="From: Your name">
+                    <button id="save-button">Save</button>
+                </div>
             </div>
         </div>
-
         <script>
             const overlay = document.getElementById('popup-overlay');
             const closeBtn = document.getElementById('popup-close');
