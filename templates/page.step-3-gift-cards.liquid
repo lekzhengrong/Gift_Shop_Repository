@@ -185,17 +185,27 @@
             updateStickyCart();
         }
 
-            document.querySelectorAll('.select-design').forEach(button => {
+             // Open popup on button click
+             document.querySelectorAll('.select-design').forEach(button => {
                 button.addEventListener('click', function() {
                     selectedProductId = this.getAttribute('data-product-id');
                     overlay.style.display = 'flex';
                 });
             });
 
+            // Close popup on close button click
             closeBtn.addEventListener('click', function() {
                 overlay.style.display = 'none';
             });
 
+            // Close popup on clicking outside the popup content
+            overlay.addEventListener('click', function(event) {
+                if (event.target === overlay) {
+                    overlay.style.display = 'none';
+                }
+            });
+
+            // Save button logic
             saveBtn.addEventListener('click', function() {
                 const message = document.getElementById('gift-message').value;
                 const fromName = document.getElementById('gift-from').value;
