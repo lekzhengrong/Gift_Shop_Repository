@@ -97,6 +97,23 @@
             flex: 1;
         }
 
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .cart-item-controls button {
+            width: 25px;
+            height: 25px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            background: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
         #next-button {
             width: 100%;
             padding: 10px;
@@ -139,7 +156,7 @@
                     <span class="product-name">{{ product.title }}</span>
                     <span class="product-price">${{ product.price | divided_by: 100 }}</span>
                 </div>
-                <button class="select-design" data-id="{{ product.variants.first.id }}" data-title="{{ product.title }}" data-image="{{ product.featured_image | img_url: 'medium' }}">
+                <button class="select-design" data-id="{{ product.variants.first.id }}" data-title="{{ product.title }}" data-image="{{ product.featured_image | img_url: 'medium' }}" data-price="{{ product.price | divided_by: 100 }}">
                     Select Design
                 </button>
             </div>
@@ -148,9 +165,10 @@
 
         <!-- Sticky Cart -->
         <div class="sticky-cart">
-            <h3>Your Selected Box</h3>
+            <h3>Your Box</h3>
             <div id="cart-items"></div>
             <div class="cart-summary">
+                <p><strong>Total:</strong> $<span id="cart-total">0.00</span></p>
                 <button id="next-button" disabled>Select your gifts</button>
             </div>
         </div>
@@ -165,36 +183,71 @@
                 const boxId = this.dataset.id;
                 const boxTitle = this.dataset.title;
                 const boxImage = this.dataset.image;
+                const boxPrice = parseFloat(this.dataset.price);
 
-                updateCart(boxId, boxTitle, boxImage);
+                addToCart(boxId, boxTitle, boxPrice, boxImage, 1);
                 document.getElementById('next-button').disabled = false;
             });
         });
 
-        function updateCart(boxId, title, image) {
+        function addToCart(productId, title, price, image, quantity) {
+            if (!cart[productId]) {
+                cart[productId] = { title, price, quantity, image };
+            } else {
+                cart[productId].quantity += quantity;
+            }
+            updateStickyCart();
+        }
+
+        function updateStickyCart() {
             const cartItemsContainer = document.getElementById('cart-items');
             cartItemsContainer.innerHTML = '';
+            let total = 0;
 
-            const cartItem = document.createElement('div');
-            cartItem.className = 'cart-item';
-            cartItem.innerHTML = `
-                <img src="${image}" alt="${title}">
-                <div class="cart-item-info">
-                    <div>${title}</div>
-                </div>
-            `;
+            Object.entries(cart).forEach(([productId, item]) => {
+                const { title, price, quantity, image } = item;
+                total += price * quantity;
 
-            cartItemsContainer.appendChild(cartItem);
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    <img src="${image}" alt="${title}">
+                    <div class="cart-item-info">
+                        <div>${title}</div>
+                        <div class="cart-item-controls">
+                            <button onclick="decreaseQuantity('${productId}')">-</button>
+                            <span>${quantity}</span>
+                            <button onclick="increaseQuantity('${productId}')">+</button>
+                        </div>
+                        <div>$${(price * quantity).toFixed(2)}</div>
+                    </div>
+                `;
+                cartItemsContainer.appendChild(cartItem);
+            });
+
+            document.getElementById('cart-total').textContent = total.toFixed(2);
+        }
+
+        function decreaseQuantity(productId) {
+            if (cart[productId].quantity > 1) {
+                cart[productId].quantity -= 1;
+            } else {
+                delete cart[productId];
+            }
+            updateStickyCart();
+        }
+
+        function increaseQuantity(productId) {
+            cart[productId].quantity += 1;
+            updateStickyCart();
         }
 
         document.getElementById('next-button').addEventListener('click', function () {
-            const selectedBox = document.querySelector('.cart-item');
+            const selectedBox = Object.keys(cart)[0];
             if (selectedBox) {
-                const boxId = selectedBox.querySelector('img').alt; // Using alt as a placeholder for ID
-                window.location.href = `/pages/gift-product?box_id=${boxId}`;
+                window.location.href = `/pages/gift-product?box_id=${selectedBox}`;
             }
         });
     </script>
-
 </body>
 </html>

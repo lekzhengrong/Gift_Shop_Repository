@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select Gift Box</title>
+    <title>Zach Theme Store</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -20,23 +20,23 @@
             margin: 0 auto;
         }
 
-        .box-options {
+        .product-options {
             flex: 1;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 12px;
             row-gap: 12px;
-        }
+            grid-auto-rows: min-content;
+        }   
 
-        .box-option {
+        .product-option {
             border: 1px solid #eee;
             padding: 12px;
             border-radius: 8px;
-            text-align: center;
             height: fit-content;
         }
 
-        .box-option img {
+        .product-option img {
             width: 100%;
             height: 180px;
             object-fit: cover;
@@ -45,27 +45,45 @@
             display: block;
         }
 
+        .quantity-controls {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+        }
+
+        .quantity-controls button {
+            width: 28px;
+            height: 28px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            background: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .product-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
         .product-info {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
-            font-size: 14px;
         }
 
-        .select-design {
-            width: 95%;
-            padding: 10px;
+        .add-to-box {
+            width: 100%;
+            padding: 8px;
             background: #000;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        .select-design:hover {
-            background: #333;
+            display: block;
         }
 
         .sticky-cart {
@@ -114,7 +132,7 @@
             border-radius: 4px;
         }
 
-        #next-button {
+        #checkout-button {
             width: 100%;
             padding: 10px;
             background: #000;
@@ -126,16 +144,16 @@
             transition: background-color 0.2s ease;
         }
 
-        #next-button:hover {
+        #checkout-button:hover {
             background: #333;
         }
 
-        #next-button:disabled {
+        #checkout-button:disabled {
             cursor: default;
             opacity: 0.7;
         }
 
-        .step1 {
+        .step2{
             display: flex;
             gap: 20px;
             padding: 20px;
@@ -145,20 +163,31 @@
     </style>
 </head>
 <body>
-    <h2 class="step1">Step 1: Choose a Gift Box</h2>
+    <h2 class="step2">Step 2: Choose Your Gift Products</h2>
     <div class="container">
-        <!-- Box Options -->
-        <div class="box-options">
-            {% for product in collections['gift-boxes'].products %}
-            <div class="box-option">
+        <!-- Product Options -->
+        <div class="product-options">
+            {% for product in collections['gift-products'].products %}
+            <div class="product-option">
                 <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-                <div class="product-info">
-                    <span class="product-name">{{ product.title }}</span>
-                    <span class="product-price">${{ product.price | divided_by: 100 }}</span>
+                <div class="product-details">
+                    <div class="product-info">
+                        <span class="product-name">{{ product.title }}</span>
+                        <span class="product-price">${{ product.price | divided_by: 100 }}</span>
+                    </div>
+                    <div class="quantity-controls" data-id="{{ product.variants.first.id }}">
+                        <button type="button" class="decrease-quantity">-</button>
+                        <span class="quantity-display">1</span>
+                        <button type="button" class="increase-quantity">+</button>
+                    </div>
+                    <button type="button" class="add-to-box" 
+                        data-id="{{ product.variants.first.id }}" 
+                        data-title="{{ product.title }}" 
+                        data-price="{{ product.price | divided_by: 100 }}" 
+                        data-image="{{ product.featured_image | img_url: 'medium' }}">
+                        Add to Box
+                    </button>
                 </div>
-                <button class="select-design" data-id="{{ product.variants.first.id }}" data-title="{{ product.title }}" data-image="{{ product.featured_image | img_url: 'medium' }}" data-price="{{ product.price | divided_by: 100 }}">
-                    Select Design
-                </button>
             </div>
             {% endfor %}
         </div>
@@ -169,7 +198,7 @@
             <div id="cart-items"></div>
             <div class="cart-summary">
                 <p><strong>Total:</strong> $<span id="cart-total">0.00</span></p>
-                <button id="next-button" disabled>Select your gifts</button>
+                <button type="button" id="checkout-button">Checkout</button>
             </div>
         </div>
     </div>
@@ -177,18 +206,38 @@
     <script>
         const cart = {};
 
-        // Handle "Select Design" button click
-        document.querySelectorAll('.select-design').forEach(button => {
+        // Add click handlers for all "Add to Box" buttons
+        document.querySelectorAll('.add-to-box').forEach(button => {
             button.addEventListener('click', function() {
-                const boxId = this.dataset.id;
-                const boxTitle = this.dataset.title;
-                const boxImage = this.dataset.image;
-                const boxPrice = parseFloat(this.dataset.price);
-
-                addToCart(boxId, boxTitle, boxPrice, boxImage, 1);
-                document.getElementById('next-button').disabled = false;
+                const { id, title, price, image } = this.dataset;
+                addToCart(id, title, parseFloat(price), image, 1);
+                toggleQuantityControls(id);
             });
         });
+
+        // Add click handlers for quantity controls
+        document.querySelectorAll('.quantity-controls').forEach(controls => {
+            const productId = controls.dataset.id;
+            controls.querySelector('.decrease-quantity').addEventListener('click', () => {
+                decreaseQuantity(productId);
+            });
+            controls.querySelector('.increase-quantity').addEventListener('click', () => {
+                increaseQuantity(productId);
+            });
+        });
+
+        function toggleQuantityControls(productId) {
+            const option = document.querySelector(`.product-option .add-to-box[data-id="${productId}"]`).closest('.product-option');
+            option.querySelector('.add-to-box').style.display = 'none';
+            option.querySelector('.quantity-controls').style.display = 'flex';
+        }
+
+        function resetQuantityControls(productId) {
+            const option = document.querySelector(`.product-option .quantity-controls[data-id="${productId}"]`).closest('.product-option');
+            option.querySelector('.add-to-box').style.display = 'block';
+            option.querySelector('.quantity-controls').style.display = 'none';
+            option.querySelector('.quantity-display').textContent = '1';
+        }
 
         function addToCart(productId, title, price, image, quantity) {
             if (!cart[productId]) {
@@ -233,6 +282,7 @@
                 cart[productId].quantity -= 1;
             } else {
                 delete cart[productId];
+                resetQuantityControls(productId);
             }
             updateStickyCart();
         }
@@ -242,10 +292,45 @@
             updateStickyCart();
         }
 
-        document.getElementById('next-button').addEventListener('click', function () {
-            const selectedBox = Object.keys(cart)[0];
-            if (selectedBox) {
-                window.location.href = `/pages/gift-product?box_id=${selectedBox}`;
+        // Updated Checkout button handler
+        document.getElementById('checkout-button').addEventListener('click', async function() {
+            const button = this;
+            const originalText = button.textContent;
+            const items = Object.entries(cart).map(([id, item]) => ({
+                id: id,
+                quantity: item.quantity
+            }));
+
+            if (items.length === 0) {
+                alert('Your cart is empty. Add some items first!');
+                return;
+            }
+
+            try {
+                // Update button state
+                button.disabled = true;
+                button.textContent = 'Loading...';
+
+                // Send the cart data to Shopify's cart API
+                for (let item of items) {
+                    await fetch('/cart/add.js', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(item)
+                    });
+                }
+
+                // Redirect to Shopify's checkout page
+                window.location.href = '/cart';
+            } catch (error) {
+                console.error('Error proceeding to checkout:', error);
+                alert('There was an issue with checkout. Please try again.');
+                
+                // Reset button state on error
+                button.disabled = false;
+                button.textContent = originalText;
             }
         });
     </script>
