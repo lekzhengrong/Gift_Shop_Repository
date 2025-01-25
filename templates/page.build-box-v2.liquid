@@ -45,6 +45,29 @@
             display: block;
         }
 
+        .product-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .select-design {
+            width: 95%;
+            padding: 10px;
+            background: #000;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .select-design:hover {
+            background: #333;
+        }
+
         .sticky-cart {
             width: 300px;
             background: #f9f9f9;
@@ -112,8 +135,10 @@
             {% for product in collections['gift-boxes'].products %}
             <div class="box-option">
                 <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-                <span class="product-name">{{ product.title }}</span><br>
-                <span class="product-price">${{ product.price | divided_by: 100 }}</span><br>
+                <div class="product-info">
+                    <span class="product-name">{{ product.title }}</span>
+                    <span class="product-price">${{ product.price | divided_by: 100 }}</span>
+                </div>
                 <button class="select-design" data-id="{{ product.variants.first.id }}" data-title="{{ product.title }}" data-image="{{ product.featured_image | img_url: 'medium' }}">
                     Select Design
                 </button>
@@ -170,5 +195,6 @@
             }
         });
     </script>
+
 </body>
 </html>
