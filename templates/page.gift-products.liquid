@@ -333,6 +333,42 @@
                 button.textContent = originalText;
             }
         });
+
+        function getQueryParams() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+        boxId: params.get('box_id'),
+        boxTitle: params.get('box_title'),
+        boxPrice: parseFloat(params.get('box_price')),
+        boxImage: params.get('box_image'),
+    };
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const queryParams = getQueryParams();
+    if (queryParams.boxId) {
+        // Prepopulate the sticky cart with the selected gift box
+        cart[queryParams.boxId] = {
+            title: queryParams.boxTitle,
+            price: queryParams.boxPrice,
+            quantity: 1,
+            image: queryParams.boxImage,
+        };
+        updateStickyCart();
+    }
+});
+
+function decreaseQuantity(productId) {
+    if (productId in cart && cart[productId].quantity > 1) {
+        cart[productId].quantity -= 1;
+    } else if (productId !== getQueryParams().boxId) {
+        delete cart[productId];
+        resetQuantityControls(productId);
+    }
+    updateStickyCart();
+}
+
+
     </script>
 </body>
 </html>
