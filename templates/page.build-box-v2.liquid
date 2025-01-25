@@ -114,7 +114,8 @@
                 <input type="radio" id="box-{{ product.variants.first.id }}" name="box_id" value="{{ product.variants.first.id }}" required>
                 <label for="box-{{ product.variants.first.id }}">
                     <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-                    <p>{{ product.title }}</p>
+                    <span class="product-name">{{ product.title }}</span>
+                    <span class="product-price">${{ product.price | divided_by: 100 }}</span>
                 </label>
             </div>
             {% endfor %}
