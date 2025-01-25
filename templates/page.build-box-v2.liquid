@@ -111,12 +111,12 @@
         <div class="box-options">
             {% for product in collections['gift-boxes'].products %}
             <div class="box-option">
-                <input type="radio" id="box-{{ product.variants.first.id }}" name="box_id" value="{{ product.variants.first.id }}" required>
-                <label for="box-{{ product.variants.first.id }}">
-                    <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-                    <span class="product-name">{{ product.title }}</span>
-                    <span class="product-price">${{ product.price | divided_by: 100 }}</span>
-                </label>
+                <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
+                <span class="product-name">{{ product.title }}</span><br>
+                <span class="product-price">${{ product.price | divided_by: 100 }}</span><br>
+                <button class="select-design" data-id="{{ product.variants.first.id }}" data-title="{{ product.title }}" data-image="{{ product.featured_image | img_url: 'medium' }}">
+                    Select Design
+                </button>
             </div>
             {% endfor %}
         </div>
@@ -126,7 +126,7 @@
             <h3>Your Selected Box</h3>
             <div id="cart-items"></div>
             <div class="cart-summary">
-                <button id="next-button" disabled>Next</button>
+                <button id="next-button" disabled>Select your gifts</button>
             </div>
         </div>
     </div>
@@ -134,15 +134,14 @@
     <script>
         const cart = {};
 
-        // Handle box selection
-        document.querySelectorAll('input[name="box_id"]').forEach(radio => {
-            radio.addEventListener('change', function() {
-                const selectedBoxId = this.value;
-                const selectedBoxLabel = this.nextElementSibling;
-                const boxTitle = selectedBoxLabel.querySelector('p').textContent;
-                const boxImage = selectedBoxLabel.querySelector('img').src;
+        // Handle "Select Design" button click
+        document.querySelectorAll('.select-design').forEach(button => {
+            button.addEventListener('click', function() {
+                const boxId = this.dataset.id;
+                const boxTitle = this.dataset.title;
+                const boxImage = this.dataset.image;
 
-                updateCart(selectedBoxId, boxTitle, boxImage);
+                updateCart(boxId, boxTitle, boxImage);
                 document.getElementById('next-button').disabled = false;
             });
         });
@@ -164,9 +163,11 @@
         }
 
         document.getElementById('next-button').addEventListener('click', function () {
-            const selectedBox = document.querySelector('input[name="box_id"]:checked');
-            const boxId = selectedBox.value;
-            window.location.href = `/pages/gift-product?box_id=${boxId}`;
+            const selectedBox = document.querySelector('.cart-item');
+            if (selectedBox) {
+                const boxId = selectedBox.querySelector('img').alt; // Using alt as a placeholder for ID
+                window.location.href = `/pages/gift-product?box_id=${boxId}`;
+            }
         });
     </script>
 </body>
