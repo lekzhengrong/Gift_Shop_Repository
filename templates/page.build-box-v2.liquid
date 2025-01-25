@@ -9,10 +9,18 @@
           .box-options { display: flex; gap: 20px; }
           .box-option { text-align: center; }
           .box-option img { width: 150px; height: auto; }
+
+          .step1{
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
       </style>
   </head>
   <body>
-      <h2>Step 1: Choose a Gift Box</h2>
+      <h2 class = "step1">Step 1: Choose a Gift Box</h2>
       <div class="box-options">
           {% for product in collections['gift-boxes'].products %}
               <div class="box-option">
