@@ -97,23 +97,6 @@
             flex: 1;
         }
 
-        .cart-item-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 5px;
-        }
-
-        .cart-item-controls button {
-            width: 25px;
-            height: 25px;
-            font-size: 14px;
-            border: 1px solid #ddd;
-            background: #fff;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-
         #next-button {
             width: 100%;
             padding: 10px;
@@ -185,16 +168,14 @@
                 const boxImage = this.dataset.image;
                 const boxPrice = parseFloat(this.dataset.price);
 
-                addToCart(boxId, boxTitle, boxPrice, boxImage, 1);
+                addToCart(boxId, boxTitle, boxPrice, boxImage);
                 document.getElementById('next-button').disabled = false;
             });
         });
 
-        function addToCart(productId, title, price, image, quantity) {
+        function addToCart(productId, title, price, image) {
             if (!cart[productId]) {
-                cart[productId] = { title, price, quantity, image };
-            } else {
-                cart[productId].quantity += quantity;
+                cart[productId] = { title, price, image };
             }
             updateStickyCart();
         }
@@ -205,8 +186,8 @@
             let total = 0;
 
             Object.entries(cart).forEach(([productId, item]) => {
-                const { title, price, quantity, image } = item;
-                total += price * quantity;
+                const { title, price, image } = item;
+                total += price;
 
                 const cartItem = document.createElement('div');
                 cartItem.className = 'cart-item';
@@ -214,12 +195,7 @@
                     <img src="${image}" alt="${title}">
                     <div class="cart-item-info">
                         <div>${title}</div>
-                        <div class="cart-item-controls">
-                            <button onclick="decreaseQuantity('${productId}')">-</button>
-                            <span>${quantity}</span>
-                            <button onclick="increaseQuantity('${productId}')">+</button>
-                        </div>
-                        <div>$${(price * quantity).toFixed(2)}</div>
+                        <div>$${price.toFixed(2)}</div>
                     </div>
                 `;
                 cartItemsContainer.appendChild(cartItem);
@@ -228,36 +204,20 @@
             document.getElementById('cart-total').textContent = total.toFixed(2);
         }
 
-        function decreaseQuantity(productId) {
-            if (cart[productId].quantity > 1) {
-                cart[productId].quantity -= 1;
-            } else {
-                delete cart[productId];
-            }
-            updateStickyCart();
-        }
-
-        function increaseQuantity(productId) {
-            cart[productId].quantity += 1;
-            updateStickyCart();
-        }
-
         document.getElementById('next-button').addEventListener('click', function () {
-    const selectedBox = Object.entries(cart)[0]; // Assuming the selected box is the first item in the cart
-    if (selectedBox) {
-        const [boxId, boxDetails] = selectedBox;
-        const boxParams = new URLSearchParams({
-        box_id: boxId,
-        box_title: boxDetails.title,
-        box_price: boxDetails.price,
-        box_image: boxDetails.image,
-        productName: boxDetails.title // Add this line
-         });
+            const selectedBox = Object.entries(cart)[0]; // Assuming the selected box is the first item in the cart
+            if (selectedBox) {
+                const [boxId, boxDetails] = selectedBox;
+                const boxParams = new URLSearchParams({
+                    box_id: boxId,
+                    box_title: boxDetails.title,
+                    box_price: boxDetails.price,
+                    box_image: boxDetails.image,
+                });
 
-        window.location.href = `/pages/gift-product?${boxParams.toString()}`;
-    }
-});
-
+                window.location.href = `/pages/gift-product?${boxParams.toString()}`;
+            }
+        });
     </script>
 </body>
 </html>
