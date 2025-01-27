@@ -205,7 +205,7 @@
                     overlay.style.display = 'none';
                 }
             });
-
+            
             saveBtn.addEventListener('click', function () {
     const message = document.getElementById('gift-message').value;
     const fromName = document.getElementById('gift-from').value;
@@ -219,7 +219,8 @@
     const payload = {
         items: [
             {
-                id: selectedProductId, // Ensure this is correct
+                id: selectedProductId, // The product ID
+                variant_id: 1,          // Default variant ID for products with no variants
                 quantity: 1,
                 properties: {
                     'Gift Message': message,
@@ -258,6 +259,8 @@
         alert(`Failed to save customization: ${error.message}`);
     });
 });
+
+          
 
         </script>
     </body>
