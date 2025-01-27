@@ -219,7 +219,7 @@
                 const payload = {
                     items: [
                         {
-                            id: selectedProductId,
+                            id: selectedProductId, // Only use product ID, no variant_id
                             quantity: 1,
                             properties: {
                                 'Gift Message': message,
@@ -242,20 +242,3 @@
                             console.error('Error details:', data);
                             throw new Error(data.message || 'Unknown error occurred.');
                         });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Success:', data);
-                    alert('Gift card customization saved!');
-                    overlay.style.display = 'none';
-                })
-                .catch(error => {
-                    console.error('Error occurred:', error);
-                    alert(`Failed to save customization: ${error.message}`);
-                });
-            });
-        </script>
-    </body>
-    </html>
-</div>
