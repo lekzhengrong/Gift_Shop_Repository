@@ -1,287 +1,198 @@
 <div id="gift-cards-step" class="gift-cards-step">
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Step 3: Add a Gift Card</title>
-        <style>
-            .gift-card-option { 
-                text-align: center; 
-                border: 1px solid #ccc; 
-                padding: 10px; 
-                border-radius: 5px;
-            }
-            .gift-card-option img { 
-                width: 150px; 
-                height: auto; 
-            }
-            .popup-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0, 0, 0, 0.5);
-                display: none;
-                justify-content: center;
-                align-items: center;
-            }
-            .container {
-                display: flex;
-                gap: 20px;
-                padding: 20px;
-                max-width: 1400px;
-                margin: 0 auto;
-            }
-            .popup {
-                background: white;
-                padding: 20px;
-                border-radius: 5px;
-                width: 300px;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-                text-align: center;
-                position: relative;
-            }
-            .popup .close {
-                position: absolute;
-                top: 10px;
-                right: 10px;
-                cursor: pointer;
-                font-size: 18px;
-                font-weight: bold;
-            }
-            .popup textarea, .popup input {
-                width: 100%;
-                margin-bottom: 10px;
-            }
-            .popup input[type="date"] {
-                margin-bottom: 10px;
-            }
-            .product-info {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-            .gift-card-options {
-                flex: 1;
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 12px;
-                row-gap: 12px;
-                grid-auto-rows: min-content;
-            }
-            .sticky-cart {
-                width: 300px;
-                background: #f9f9f9;
-                padding: 20px;
-                border-radius: 8px;
-                position: sticky;
-                top: 20px;
-                height: calc(100vh - 40px);
-                overflow-y: auto;
-            }
-        </style>
-    </head>
-    <body>
-        <h2>Step 3: Add a Gift Card</h2>
-        <div class="container">
-            <div class="gift-card-options">
-                {% for product in collections['gift-cards'].products %}
-                    <div class="gift-card-option" data-product-id="{{ product.id }}">
-                        <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-                        <div class="product-info">
-                            <span class="product-name">{{ product.title }}</span>
-                            <span class="product-price">${{ product.price | divided_by: 100 }}</span>
-                        </div>
-                        <button class="select-design" data-product-id="{{ product.id }}" data-variants="{{ product.variants | json }}">Select Design</button>
+    <h2>Step 3: Add a Gift Card</h2>
+    <div class="container">
+        <div class="gift-card-options">
+            {% for product in collections['gift-cards'].products %}
+                <div class="gift-card-option" data-product-id="{{ product.id }}">
+                    <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
+                    <div class="product-info">
+                        <span class="product-name">{{ product.title }}</span>
+                        <span class="product-price">${{ product.price | divided_by: 100 }}</span>
                     </div>
-                {% endfor %}
-            </div>
-
-            <div class="popup-overlay" id="popup-overlay">
-                <div class="popup">
-                    <span class="close" id="popup-close">&times;</span>
-                    <h3>Customize Your Gift Card</h3>
-                    <textarea id="gift-message" maxlength="200" placeholder="Enter your message (max 200 characters)"></textarea>
-                    <input type="text" id="gift-from" placeholder="From: Your name">
-                    <label for="delivery-date">Select Delivery Date:</label>
-                    <input type="date" id="delivery-date" min="">
-                    <button id="save-button">Save</button>
+                    <button class="select-design" data-product-id="{{ product.id }}" data-variants="{{ product.variants | json }}">Select Design</button>
                 </div>
-            </div>
-            
-            <!-- Sticky Cart -->
-            <div class="sticky-cart">
-                <h3>Your Gift</h3>
-                <div id="cart-items"></div>
-                <div class="cart-summary">
-                    <p><strong>Total:</strong> $<span id="cart-total">0.00</span></p>
-                    <button type="button" id="checkout-button">Checkout</button>
-                </div>
-            </div>
+            {% endfor %}
         </div>
 
-        <script>
-            const overlay = document.getElementById('popup-overlay');
-            const closeBtn = document.getElementById('popup-close');
-            const saveBtn = document.getElementById('save-button');
-            const deliveryDateInput = document.getElementById('delivery-date');
-            let selectedProductId = null;
-            let selectedVariants = [];
+        <div class="popup-overlay" id="popup-overlay">
+            <div class="popup">
+                <span class="close" id="popup-close">&times;</span>
+                <h3>Customize Your Gift Card</h3>
+                <textarea id="gift-message" maxlength="200" placeholder="Enter your message (max 200 characters)"></textarea>
+                <input type="text" id="gift-from" placeholder="From: Your name">
+                <label for="delivery-date">Select Delivery Date:</label>
+                <input type="date" id="delivery-date" min="">
+                <button id="save-button">Save</button>
+            </div>
+        </div>
+        
+        <!-- Sticky Cart -->
+        <div class="sticky-cart">
+            <h3>Your Gift</h3>
+            <div id="cart-items"></div>
+            <div class="cart-summary">
+                <p><strong>Total:</strong> $<span id="cart-total">0.00</span></p>
+                <button type="button" id="checkout-button">Checkout</button>
+            </div>
+        </div>
+    </div>
 
-            const cart = {};
+    <script>
+        const overlay = document.getElementById('popup-overlay');
+        const closeBtn = document.getElementById('popup-close');
+        const saveBtn = document.getElementById('save-button');
+        const deliveryDateInput = document.getElementById('delivery-date');
+        let selectedProductId = null;
+        let selectedVariants = [];
 
-            // Set minimum delivery date (5 calendar days from today)
-            const today = new Date();
-            const minDeliveryDate = new Date(today);
-            minDeliveryDate.setDate(today.getDate() + 5);
-            deliveryDateInput.min = minDeliveryDate.toISOString().split('T')[0];
+        const cart = {};
 
-            function addToCart(productId, title, price, image, quantity) {
-                if (!cart[productId]) {
-                    cart[productId] = { title, price, quantity, image };
-                } else {
-                    cart[productId].quantity += quantity;
-                }
-                updateStickyCart();
+        // Set minimum delivery date (5 calendar days from today)
+        const today = new Date();
+        const minDeliveryDate = new Date(today);
+        minDeliveryDate.setDate(today.getDate() + 5);
+        deliveryDateInput.min = minDeliveryDate.toISOString().split('T')[0];
+
+        function addToCart(productId, title, price, image, quantity) {
+            if (!cart[productId]) {
+                cart[productId] = { title, price, quantity, image };
+            } else {
+                cart[productId].quantity += quantity;
             }
-
-            function updateStickyCart() {
-                const cartItemsContainer = document.getElementById('cart-items');
-                cartItemsContainer.innerHTML = '';
-                let total = 0;
-
-                Object.entries(cart).forEach(([productId, item]) => {
-                    const { title, price, quantity, image } = item;
-                    total += price * quantity;
-
-                    const cartItem = document.createElement('div');
-                    cartItem.className = 'cart-item';
-                    cartItem.innerHTML = `
-                        <img src="${image}" alt="${title}">
-                        <div class="cart-item-info">
-                            <div>${title}</div>
-                            <div class="cart-item-controls">
-                                <button onclick="decreaseQuantity('${productId}')">-</button>
-                                <span>${quantity}</span>
-                                <button onclick="increaseQuantity('${productId}')">+</button>
-                            </div>
-                            <div>$${(price * quantity).toFixed(2)}</div>
-                        </div>
-                    `;
-                    cartItemsContainer.appendChild(cartItem);
-                });
-
-                document.getElementById('cart-total').textContent = total.toFixed(2);
-            }
-
-            function decreaseQuantity(productId) {
-                if (cart[productId].quantity > 1) {
-                    cart[productId].quantity -= 1;
-                } else {
-                    delete cart[productId];
-                }
-                updateStickyCart();
-            }
-
-            function increaseQuantity(productId) {
-                cart[productId].quantity += 1;
-                updateStickyCart();
-            }
-
-            document.querySelectorAll('.select-design').forEach(button => {
-    button.addEventListener('click', function() {
-        const variantsData = this.getAttribute('data-variants');
-        try {
-            // Log the raw value of data-variants for debugging
-            console.log('Raw variants data:', variantsData);
-            // Parse the variants safely
-            selectedVariants = JSON.parse(variantsData);
-            selectedProductId = this.getAttribute('data-product-id');
-            overlay.style.display = 'flex';
-        } catch (e) {
-            console.error('Error parsing variants data:', e);
-            alert('There was an issue selecting the design. Please try again.');
+            updateStickyCart();
         }
-    });
-});
 
+        function updateStickyCart() {
+            const cartItemsContainer = document.getElementById('cart-items');
+            cartItemsContainer.innerHTML = '';
+            let total = 0;
 
+            Object.entries(cart).forEach(([productId, item]) => {
+                const { title, price, quantity, image } = item;
+                total += price * quantity;
 
-            closeBtn.addEventListener('click', function() {
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    <img src="${image}" alt="${title}">
+                    <div class="cart-item-info">
+                        <div>${title}</div>
+                        <div class="cart-item-controls">
+                            <button onclick="decreaseQuantity('${productId}')">-</button>
+                            <span>${quantity}</span>
+                            <button onclick="increaseQuantity('${productId}')">+</button>
+                        </div>
+                        <div>$${(price * quantity).toFixed(2)}</div>
+                    </div>
+                `;
+                cartItemsContainer.appendChild(cartItem);
+            });
+
+            document.getElementById('cart-total').textContent = total.toFixed(2);
+        }
+
+        function decreaseQuantity(productId) {
+            if (cart[productId].quantity > 1) {
+                cart[productId].quantity -= 1;
+            } else {
+                delete cart[productId];
+            }
+            updateStickyCart();
+        }
+
+        function increaseQuantity(productId) {
+            cart[productId].quantity += 1;
+            updateStickyCart();
+        }
+
+        document.querySelectorAll('.select-design').forEach(button => {
+            button.addEventListener('click', function() {
+                const variantsData = this.getAttribute('data-variants');
+                try {
+                    // Log the raw value of data-variants for debugging
+                    console.log('Raw variants data:', variantsData);
+                    // Parse the variants safely
+                    selectedVariants = JSON.parse(variantsData);
+                    selectedProductId = this.getAttribute('data-product-id');
+                    overlay.style.display = 'flex';
+                } catch (e) {
+                    console.error('Error parsing variants data:', e);
+                    alert('There was an issue selecting the design. Please try again.');
+                }
+            });
+        });
+
+        closeBtn.addEventListener('click', function() {
+            overlay.style.display = 'none';
+        });
+
+        overlay.addEventListener('click', function(event) {
+            if (event.target === overlay) {
                 overlay.style.display = 'none';
-            });
+            }
+        });
 
-            overlay.addEventListener('click', function(event) {
-                if (event.target === overlay) {
-                    overlay.style.display = 'none';
-                }
-            });
+        saveBtn.addEventListener('click', function () {
+            const message = document.getElementById('gift-message').value;
+            const fromName = document.getElementById('gift-from').value;
+            const deliveryDate = document.getElementById('delivery-date').value;
 
-            saveBtn.addEventListener('click', function () {
-                const message = document.getElementById('gift-message').value;
-                const fromName = document.getElementById('gift-from').value;
-                const deliveryDate = document.getElementById('delivery-date').value;
+            if (!message || !fromName || !deliveryDate) {
+                alert('Please fill out all fields.');
+                return;
+            }
 
-                if (!message || !fromName || !deliveryDate) {
-                    alert('Please fill out all fields.');
-                    return;
-                }
+            // Ensure the selected variant ID is available
+            const variantId = selectedVariants.length > 0 ? selectedVariants[0].id : null;
 
-                // Ensure the selected variant ID is available
-                const variantId = selectedVariants.length > 0 ? selectedVariants[0].id : null; // Here you can add logic to allow selecting a variant if needed
+            if (!variantId) {
+                alert('Please select a valid variant.');
+                return;
+            }
 
-                if (!variantId) {
-                    alert('Please select a valid variant.');
-                    return;
-                }
-
-                const payload = {
-                    items: [
-                        {
-                            id: selectedProductId,          // The product ID
-                            variant_id: variantId,          // The correct variant ID
-                            quantity: 1,
-                            properties: {
-                                'Gift Message': message,
-                                'From': fromName,
-                                'Delivery Date': deliveryDate,
-                            }
+            const payload = {
+                items: [
+                    {
+                        id: selectedProductId,          // The product ID
+                        variant_id: variantId,          // The correct variant ID
+                        quantity: 1,
+                        properties: {
+                            'Gift Message': message,
+                            'From': fromName,
+                            'Delivery Date': deliveryDate,
                         }
-                    ]
-                };
-
-                // Log the selected product ID and variant ID for debugging
-                console.log('Selected Product ID:', selectedProductId);
-                console.log('Selected Variant ID:', variantId);
-                console.log('Payload being sent:', payload);
-
-                fetch('/cart/add.js', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(data => {
-                            console.error('Error details:', data);
-                            throw new Error(data.message || 'Unknown error occurred.');
-                        });
                     }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Success:', data);
-                    alert('Gift card customization saved!');
-                    overlay.style.display = 'none';
-                })
-                .catch(error => {
-                    console.error('Error occurred:', error);
-                    alert(`Failed to save customization: ${error.message}`);
-                });
+                ]
+            };
+
+            // Log the selected product ID and variant ID for debugging
+            console.log('Selected Product ID:', selectedProductId);
+            console.log('Selected Variant ID:', variantId);
+            console.log('Payload being sent:', payload);
+
+            fetch('/cart/add.js', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        console.error('Error details:', data);
+                        throw new Error(data.message || 'Unknown error occurred.');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                alert('Gift card customization saved!');
+                overlay.style.display = 'none';
+            })
+            .catch(error => {
+                console.error('Error occurred:', error);
+                alert(`Failed to save customization: ${error.message}`);
             });
-        </script>
-    </body>
-    </html>
+        });
+    </script>
 </div>
