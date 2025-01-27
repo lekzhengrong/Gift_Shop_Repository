@@ -88,13 +88,13 @@
         <div class="container">
             <div class="gift-card-options">
                 {% for product in collections['gift-cards'].products %}
-                    <div class="gift-card-option">
+                    <div class="gift-card-option" data-product-id="{{ product.id }}">
                         <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
                         <div class="product-info">
                             <span class="product-name">{{ product.title }}</span>
                             <span class="product-price">${{ product.price | divided_by: 100 }}</span>
                         </div>
-                        <button class="select-design" data-product-id="{{ product.id }}">Select Design</button>
+                        <button class="select-design" data-product-id="{{ product.id }}" data-variants="{{ product.variants | json }}">Select Design</button>
                     </div>
                 {% endfor %}
             </div>
@@ -128,6 +128,7 @@
             const saveBtn = document.getElementById('save-button');
             const deliveryDateInput = document.getElementById('delivery-date');
             let selectedProductId = null;
+            let selectedVariants = [];
 
             const cart = {};
 
@@ -192,6 +193,7 @@
             document.querySelectorAll('.select-design').forEach(button => {
                 button.addEventListener('click', function() {
                     selectedProductId = this.getAttribute('data-product-id');
+                    selectedVariants = JSON.parse(this.getAttribute('data-variants'));
                     overlay.style.display = 'flex';
                 });
             });
@@ -207,64 +209,67 @@
             });
 
             saveBtn.addEventListener('click', function () {
-    const message = document.getElementById('gift-message').value;
-    const fromName = document.getElementById('gift-from').value;
-    const deliveryDate = document.getElementById('delivery-date').value;
+                const message = document.getElementById('gift-message').value;
+                const fromName = document.getElementById('gift-from').value;
+                const deliveryDate = document.getElementById('delivery-date').value;
 
-    if (!message || !fromName || !deliveryDate) {
-        alert('Please fill out all fields.');
-        return;
-    }
-
-    // Get the correct variant ID of the selected product
-    const selectedProduct = document.querySelector(`.gift-card-option[data-product-id="${selectedProductId}"]`);
-    const variantId = selectedProduct ? selectedProduct.getAttribute('data-variant-id') : 1; // Replace with correct variant ID
-
-    const payload = {
-        items: [
-            {
-                id: selectedProductId,          // The product ID
-                variant_id: variantId,          // The correct variant ID
-                quantity: 1,
-                properties: {
-                    'Gift Message': message,
-                    'From': fromName,
-                    'Delivery Date': deliveryDate,
+                if (!message || !fromName || !deliveryDate) {
+                    alert('Please fill out all fields.');
+                    return;
                 }
-            }
-        ]
-    };
 
-    // Log the selected product ID and variant ID for debugging
-    console.log('Selected Product ID:', selectedProductId);
-    console.log('Selected Variant ID:', variantId);
-    console.log('Payload being sent:', payload);
+                // Ensure the selected variant ID is available
+                const variantId = selectedVariants.length > 0 ? selectedVariants[0].id : null; // Here you can add logic to allow selecting a variant if needed
 
-    fetch('/cart/add.js', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-    })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(data => {
-                console.error('Error details:', data);
-                throw new Error(data.message || 'Unknown error occurred.');
+                if (!variantId) {
+                    alert('Please select a valid variant.');
+                    return;
+                }
+
+                const payload = {
+                    items: [
+                        {
+                            id: selectedProductId,          // The product ID
+                            variant_id: variantId,          // The correct variant ID
+                            quantity: 1,
+                            properties: {
+                                'Gift Message': message,
+                                'From': fromName,
+                                'Delivery Date': deliveryDate,
+                            }
+                        }
+                    ]
+                };
+
+                // Log the selected product ID and variant ID for debugging
+                console.log('Selected Product ID:', selectedProductId);
+                console.log('Selected Variant ID:', variantId);
+                console.log('Payload being sent:', payload);
+
+                fetch('/cart/add.js', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            console.error('Error details:', data);
+                            throw new Error(data.message || 'Unknown error occurred.');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                    alert('Gift card customization saved!');
+                    overlay.style.display = 'none';
+                })
+                .catch(error => {
+                    console.error('Error occurred:', error);
+                    alert(`Failed to save customization: ${error.message}`);
+                });
             });
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Success:', data);
-        alert('Gift card customization saved!');
-        overlay.style.display = 'none';
-    })
-    .catch(error => {
-        console.error('Error occurred:', error);
-        alert(`Failed to save customization: ${error.message}`);
-    });
-});
-
         </script>
     </body>
     </html>
