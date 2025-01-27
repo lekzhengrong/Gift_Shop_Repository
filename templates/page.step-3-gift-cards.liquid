@@ -207,54 +207,58 @@
             });
 
             saveBtn.addEventListener('click', function () {
-                const message = document.getElementById('gift-message').value;
-                const fromName = document.getElementById('gift-from').value;
-                const deliveryDate = document.getElementById('delivery-date').value;
+    const message = document.getElementById('gift-message').value;
+    const fromName = document.getElementById('gift-from').value;
+    const deliveryDate = document.getElementById('delivery-date').value;
 
-                if (!message || !fromName || !deliveryDate) {
-                    alert('Please fill out all fields.');
-                    return;
+    if (!message || !fromName || !deliveryDate) {
+        alert('Please fill out all fields.');
+        return;
+    }
+
+    const payload = {
+        items: [
+            {
+                id: selectedProductId, // Ensure this is correct
+                quantity: 1,
+                properties: {
+                    'Gift Message': message,
+                    'From': fromName,
+                    'Delivery Date': deliveryDate,
                 }
+            }
+        ]
+    };
 
-                const payload = {
-                    items: [
-                        {
-                            id: selectedProductId,
-                            quantity: 1,
-                            properties: {
-                                'Gift Message': message,
-                                'From': fromName,
-                                'Delivery Date': deliveryDate,
-                            }
-                        }
-                    ]
-                };
+    // Log the selected product ID for debugging
+    console.log('Selected Product ID:', selectedProductId);
+    console.log('Payload being sent:', payload);
 
-                console.log('Payload being sent:', payload);
-                fetch('/cart/add.js', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(data => {
-                            console.error('Error details:', data);
-                            throw new Error(data.message || 'Unknown error occurred.');
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Success:', data);
-                    alert('Gift card customization saved!');
-                    overlay.style.display = 'none';
-                })
-                .catch(error => {
-                    console.error('Error occurred:', error);
-                    alert(`Failed to save customization: ${error.message}`);
-                });
+    fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                console.error('Error details:', data);
+                throw new Error(data.message || 'Unknown error occurred.');
             });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Success:', data);
+        alert('Gift card customization saved!');
+        overlay.style.display = 'none';
+    })
+    .catch(error => {
+        console.error('Error occurred:', error);
+        alert(`Failed to save customization: ${error.message}`);
+    });
+});
+
         </script>
     </body>
     </html>
