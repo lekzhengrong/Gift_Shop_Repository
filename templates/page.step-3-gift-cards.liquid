@@ -249,6 +249,16 @@
                     }
                 });
             });
+
+            document.querySelectorAll('.select-design').forEach(button => {
+    button.addEventListener('click', function() {
+        selectedProductId = this.getAttribute('data-product-id');
+        console.log(`Selected Product ID: ${selectedProductId}`);
+        overlay.style.display = 'flex';
+    });
+});
+
+
         </script>
     </body>
     </html>
