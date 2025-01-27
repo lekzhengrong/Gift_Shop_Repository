@@ -191,12 +191,22 @@
             }
 
             document.querySelectorAll('.select-design').forEach(button => {
-                button.addEventListener('click', function() {
-                    selectedProductId = this.getAttribute('data-product-id');
-                    selectedVariants = JSON.parse(this.getAttribute('data-variants'));
-                    overlay.style.display = 'flex';
-                });
-            });
+    button.addEventListener('click', function() {
+        const variantsData = this.getAttribute('data-variants');
+        try {
+            // Log the raw value of data-variants for debugging
+            console.log('Raw variants data:', variantsData);
+            // Parse the variants safely
+            selectedVariants = JSON.parse(variantsData);
+            selectedProductId = this.getAttribute('data-product-id');
+            overlay.style.display = 'flex';
+        } catch (e) {
+            console.error('Error parsing variants data:', e);
+            alert('There was an issue selecting the design. Please try again.');
+        }
+    });
+});
+
 
             closeBtn.addEventListener('click', function() {
                 overlay.style.display = 'none';
