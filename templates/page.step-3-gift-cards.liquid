@@ -231,27 +231,30 @@
     };
 
     console.log('Payload being sent:', payload);
-
     fetch('/cart/add.js', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload)
-    }).then(response => {
-        if (response.ok) {
-            alert('Gift card customization saved!');
-            overlay.style.display = 'none';
-        } else {
-            response.json().then(data => {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+})
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
                 console.error('Error details:', data);
-                alert('Failed to save customization. Error: ' + data.message);
+                throw new Error(data.message || 'Unknown error occurred.');
             });
         }
-    }).catch(error => {
-        console.error('Network error:', error);
-        alert('A network error occurred. Please try again.');
+        return response.json();
+    })
+    .then(data => {
+        console.log('Success:', data);
+        alert('Gift card customization saved!');
+        overlay.style.display = 'none';
+    })
+    .catch(error => {
+        console.error('Error occurred:', error);
+        alert(`Failed to save customization: ${error.message}`);
     });
+
 });
 
 
