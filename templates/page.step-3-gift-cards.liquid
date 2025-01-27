@@ -6,7 +6,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Step 3: Add a Gift Card</title>
         <style>
-
             .gift-card-option { 
                 text-align: center; 
                 border: 1px solid #ccc; 
@@ -28,7 +27,6 @@
                 justify-content: center;
                 align-items: center;
             }
-
             .container {
                 display: flex;
                 gap: 20px;
@@ -53,22 +51,18 @@
                 font-size: 18px;
                 font-weight: bold;
             }
-            .popup textarea {
-                width: 100%;
-                height: 60px;
-                margin-bottom: 10px;
-            }
-            .popup input {
+            .popup textarea, .popup input {
                 width: 100%;
                 margin-bottom: 10px;
             }
-
+            .popup input[type="date"] {
+                margin-bottom: 10px;
+            }
             .product-info {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
             }
-
             .gift-card-options {
                 flex: 1;
                 display: grid;
@@ -76,7 +70,7 @@
                 gap: 12px;
                 row-gap: 12px;
                 grid-auto-rows: min-content;
-            }   
+            }
             .sticky-cart {
                 width: 300px;
                 background: #f9f9f9;
@@ -87,8 +81,6 @@
                 height: calc(100vh - 40px);
                 overflow-y: auto;
             }
-
-
         </style>
     </head>
     <body>
@@ -113,29 +105,37 @@
                     <h3>Customize Your Gift Card</h3>
                     <textarea id="gift-message" maxlength="200" placeholder="Enter your message (max 200 characters)"></textarea>
                     <input type="text" id="gift-from" placeholder="From: Your name">
+                    <label for="delivery-date">Select Delivery Date:</label>
+                    <input type="date" id="delivery-date" min="">
                     <button id="save-button">Save</button>
                 </div>
             </div>
             
-        <!-- Sticky Cart -->
-        <div class="sticky-cart">
-            <h3>Your Gift</h3>
-            <div id="cart-items"></div>
-            <div class="cart-summary">
-                <p><strong>Total:</strong> $<span id="cart-total">0.00</span></p>
-                <button type="button" id="checkout-button">Checkout</button>
+            <!-- Sticky Cart -->
+            <div class="sticky-cart">
+                <h3>Your Gift</h3>
+                <div id="cart-items"></div>
+                <div class="cart-summary">
+                    <p><strong>Total:</strong> $<span id="cart-total">0.00</span></p>
+                    <button type="button" id="checkout-button">Checkout</button>
+                </div>
             </div>
         </div>
 
-
-        </div>
         <script>
             const overlay = document.getElementById('popup-overlay');
             const closeBtn = document.getElementById('popup-close');
             const saveBtn = document.getElementById('save-button');
+            const deliveryDateInput = document.getElementById('delivery-date');
             let selectedProductId = null;
 
             const cart = {};
+
+            // Set minimum delivery date (5 calendar days from today)
+            const today = new Date();
+            const minDeliveryDate = new Date(today);
+            minDeliveryDate.setDate(today.getDate() + 5);
+            deliveryDateInput.min = minDeliveryDate.toISOString().split('T')[0];
 
             function addToCart(productId, title, price, image, quantity) {
                 if (!cart[productId]) {
@@ -209,38 +209,45 @@
             saveBtn.addEventListener('click', function() {
                 const message = document.getElementById('gift-message').value;
                 const fromName = document.getElementById('gift-from').value;
+                const deliveryDate = document.getElementById('delivery-date').value;
 
-                if (!message || !fromName) {
-                    alert('Please fill out both the message and the "From" field.');
+                if (!message || !fromName || !deliveryDate) {
+                    alert('Please fill out all fields.');
                     return;
                 }
 
-                // Save the data to the backend
-                fetch('/cart/add.js', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-        items: [
-            {
-                id: selectedProductId,
-                quantity: 1,
-                properties: {
-                    'Gift Message': message,
-                    'From': fromName
-                            }
-                        }
-                    ]
-                })
-            }).then(response => {
-                if (response.ok) {
-                    alert('Gift card customization saved!');
-                    overlay.style.display = 'none';
-                } else {
-                    alert('Failed to save the customization. Please try again.');
+                const selectedDate = new Date(deliveryDate);
+                if (selectedDate < minDeliveryDate) {
+                    alert(`Please select a delivery date at least 5 calendar days from today.`);
+                    return;
                 }
-            });
+
+                fetch('/cart/add.js', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        items: [
+                            {
+                                id: selectedProductId,
+                                quantity: 1,
+                                properties: {
+                                    'Gift Message': message,
+                                    'From': fromName,
+                                    'Delivery Date': deliveryDate
+                                }
+                            }
+                        ]
+                    })
+                }).then(response => {
+                    if (response.ok) {
+                        alert('Gift card customization saved!');
+                        overlay.style.display = 'none';
+                    } else {
+                        alert('Failed to save the customization. Please try again.');
+                    }
+                });
             });
         </script>
     </body>
