@@ -207,58 +207,64 @@
             });
 
             saveBtn.addEventListener('click', function () {
-                const message = document.getElementById('gift-message').value;
-                const fromName = document.getElementById('gift-from').value;
-                const deliveryDate = document.getElementById('delivery-date').value;
+    const message = document.getElementById('gift-message').value;
+    const fromName = document.getElementById('gift-from').value;
+    const deliveryDate = document.getElementById('delivery-date').value;
 
-                if (!message || !fromName || !deliveryDate) {
-                    alert('Please fill out all fields.');
-                    return;
+    if (!message || !fromName || !deliveryDate) {
+        alert('Please fill out all fields.');
+        return;
+    }
+
+    // Get the correct variant ID of the selected product
+    const selectedProduct = document.querySelector(`.gift-card-option[data-product-id="${selectedProductId}"]`);
+    const variantId = selectedProduct ? selectedProduct.getAttribute('data-variant-id') : 1; // Replace with correct variant ID
+
+    const payload = {
+        items: [
+            {
+                id: selectedProductId,          // The product ID
+                variant_id: variantId,          // The correct variant ID
+                quantity: 1,
+                properties: {
+                    'Gift Message': message,
+                    'From': fromName,
+                    'Delivery Date': deliveryDate,
                 }
+            }
+        ]
+    };
 
-                const payload = {
-                    items: [
-                        {
-                            id: selectedProductId, // The product ID
-                            variant_id: 1,          // Default variant ID for products with no variants
-                            quantity: 1,
-                            properties: {
-                                'Gift Message': message,
-                                'From': fromName,
-                                'Delivery Date': deliveryDate,
-                            }
-                        }
-                    ]
-                };
+    // Log the selected product ID and variant ID for debugging
+    console.log('Selected Product ID:', selectedProductId);
+    console.log('Selected Variant ID:', variantId);
+    console.log('Payload being sent:', payload);
 
-                // Log the selected product ID for debugging
-                console.log('Selected Product ID:', selectedProductId);
-                console.log('Payload being sent:', payload);
-
-                fetch('/cart/add.js', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(data => {
-                            console.error('Error details:', data);
-                            throw new Error(data.message || 'Unknown error occurred.');
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Success:', data);
-                    alert('Gift card customization saved!');
-                    overlay.style.display = 'none';
-                })
-                .catch(error => {
-                    console.error('Error occurred:', error);
-                    alert(`Failed to save customization: ${error.message}`);
-                });
+    fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                console.error('Error details:', data);
+                throw new Error(data.message || 'Unknown error occurred.');
             });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Success:', data);
+        alert('Gift card customization saved!');
+        overlay.style.display = 'none';
+    })
+    .catch(error => {
+        console.error('Error occurred:', error);
+        alert(`Failed to save customization: ${error.message}`);
+    });
+});
+
         </script>
     </body>
     </html>
