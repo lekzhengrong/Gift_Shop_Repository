@@ -94,12 +94,7 @@
                             <span class="product-name">{{ product.title }}</span>
                             <span class="product-price">${{ product.price | divided_by: 100 }}</span>
                         </div>
-                        {% comment %} In your Liquid template {% endcomment %}
-                        <button class="select-design" 
-                        data-variant-id="{{ product.selected_or_first_available_variant.id }}"
-                        data-product-handle="{{ product.handle }}">
-                        Select Design
-                        </button>
+                        <button class="select-design" data-product-id="{{ product.id }}">Select Design</button>
                     </div>
                 {% endfor %}
             </div>
@@ -211,103 +206,55 @@
                 }
             });
 
-            // Modified save button handler
-            saveBtn.addEventListener('click', function() {
-                const variantId = selectedVariantId;
+            saveBtn.addEventListener('click', function () {
                 const message = document.getElementById('gift-message').value;
                 const fromName = document.getElementById('gift-from').value;
                 const deliveryDate = document.getElementById('delivery-date').value;
 
-                if (!validateDeliveryDate(deliveryDate)) {
-                    alert('Delivery date must be at least 5 working days away');
+                if (!message || !fromName || !deliveryDate) {
+                    alert('Please fill out all fields.');
                     return;
                 }
 
+                const payload = {
+                    items: [
+                        {
+                            id: selectedProductId, // Only use product ID, no variant_id
+                            quantity: 1,
+                            properties: {
+                                'Gift Message': message,
+                                'From': fromName,
+                                'Delivery Date': deliveryDate,
+                            }
+                        }
+                    ]
+                };
+
+                console.log('Payload being sent:', payload);
                 fetch('/cart/add.js', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        items: [{
-                            id: variantId,
-                            quantity: 1,
-                            properties: {
-                                '_Gift Message': message,
-                                '_From': fromName,
-                                '_Delivery Date': deliveryDate
-                            }
-                        }]
-                    })
+                    body: JSON.stringify(payload),
                 })
-                .then(handleResponse)
-                .then(updateCartDisplay)
-                .catch(handleError);
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            console.error('Error details:', data);
+                            throw new Error(data.message || 'Unknown error occurred.');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                    alert('Gift card customization saved!');
+                    overlay.style.display = 'none';
+                })
+                .catch(error => {
+                    console.error('Error occurred:', error);
+                    alert(`Failed to save customization: ${error.message}`);
+                });
             });
-
-            // New validation function for working days
-            function validateDeliveryDate(dateString) {
-                const deliveryDate = new Date(dateString);
-                const today = new Date();
-                let workingDays = 0;
-                
-                while (today < deliveryDate) {
-                    today.setDate(today.getDate() + 1);
-                    if (today.getDay() !== 0 && today.getDay() !== 6) workingDays++;
-                }
-                
-                return workingDays >= 5;
-            }
-
-            function updateCartDisplay() {
-    fetch('/cart.js')
-        .then(response => response.json())
-        .then(cartData => {
-            const cartItemsContainer = document.getElementById('cart-items');
-            cartItemsContainer.innerHTML = '';
-            
-            cartData.items.forEach(item => {
-                const itemHTML = `
-                    <div class="cart-item">
-                        <img src="${item.image}" alt="${item.title}">
-                        <div class="item-details">
-                            <h4>${item.product_title}</h4>
-                            ${item.properties._Gift_Message ? 
-                                `<p>Message: ${item.properties._Gift_Message}</p>` : ''}
-                            ${item.properties._From ? 
-                                `<p>From: ${item.properties._From}</p>` : ''}
-                            ${item.properties._Delivery_Date ? 
-                                `<p>Delivery: ${item.properties._Delivery_Date}</p>` : ''}
-                        </div>
-                    </div>
-                `;
-                cartItemsContainer.insertAdjacentHTML('beforeend', itemHTML);
-            });
-        });
-}
-
-function handleResponse(response) {
-    if (!response.ok) {
-        return response.json().then(err => {
-            throw new Error(`${err.description} (Status: ${err.status})`);
-        });
-    }
-    return response.json();
-}
-
-function handleError(error) {
-    console.error('Error:', error);
-    alert(`Operation failed: ${error.message}`);
-    overlay.style.display = 'none';
-}
-
-// Add this after successful cart addition
-fetch('/cart/update.js', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        note: `GIFT DETAILS: ${message} | From: ${fromName} | Delivery: ${deliveryDate}`
-    })
-});
-      
         </script>
     </body>
     </html>
