@@ -51,26 +51,6 @@
                 font-size: 18px;
                 font-weight: bold;
             }
-            .popup textarea, .popup input {
-                width: 100%;
-                margin-bottom: 10px;
-            }
-            .popup input[type="date"] {
-                margin-bottom: 10px;
-            }
-            .product-info {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-            .gift-card-options {
-                flex: 1;
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 12px;
-                row-gap: 12px;
-                grid-auto-rows: min-content;
-            }
             .sticky-cart {
                 width: 300px;
                 background: #f9f9f9;
@@ -90,15 +70,11 @@
                 {% for product in collections['gift-cards'].products %}
                     <div class="gift-card-option">
                         <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-                        <div class="product-info">
-                            <span class="product-name">{{ product.title }}</span>
-                            <span class="product-price">${{ product.price | divided_by: 100 }}</span>
-                        </div>
-                        <button class="select-design" data-product-id="{{ product.id }}">Select Design</button>
+                        <button class="select-design" data-product-id="{{ product.id }}" data-product-title="{{ product.title }}" data-product-price="{{ product.price | divided_by: 100 }}" data-product-image="{{ product.featured_image | img_url: 'medium' }}">Select Design</button>
                     </div>
                 {% endfor %}
             </div>
-
+            
             <div class="popup-overlay" id="popup-overlay">
                 <div class="popup">
                     <span class="close" id="popup-close">&times;</span>
@@ -111,115 +87,53 @@
                 </div>
             </div>
             
-            <!-- Sticky Cart -->
             <div class="sticky-cart">
                 <h3>Your Gift</h3>
                 <div id="cart-items"></div>
-                <div class="cart-summary">
-                    <p><strong>Total:</strong> $<span id="cart-total">0.00</span></p>
-                    <button type="button" id="checkout-button">Checkout</button>
-                </div>
+                <p><strong>Total:</strong> $<span id="cart-total">0.00</span></p>
+                <button type="button" id="checkout-button">Checkout</button>
             </div>
         </div>
-
+        
         <script>
             const overlay = document.getElementById('popup-overlay');
             const closeBtn = document.getElementById('popup-close');
             const saveBtn = document.getElementById('save-button');
             const deliveryDateInput = document.getElementById('delivery-date');
-            let selectedProductId = null;
-
+            let selectedProduct = null;
+            
             const cart = {};
-
-            // Set minimum delivery date (5 calendar days from today)
-            const today = new Date();
-            const minDeliveryDate = new Date(today);
-            minDeliveryDate.setDate(today.getDate() + 5);
-            deliveryDateInput.min = minDeliveryDate.toISOString().split('T')[0];
-
-            function addToCart(productId, title, price, image, quantity) {
-                if (!cart[productId]) {
-                    cart[productId] = { title, price, quantity, image };
-                } else {
-                    cart[productId].quantity += quantity;
-                }
-                updateStickyCart();
-            }
-
-            function updateStickyCart() {
-                const cartItemsContainer = document.getElementById('cart-items');
-                cartItemsContainer.innerHTML = '';
-                let total = 0;
-
-                Object.entries(cart).forEach(([productId, item]) => {
-                    const { title, price, quantity, image } = item;
-                    total += price * quantity;
-
-                    const cartItem = document.createElement('div');
-                    cartItem.className = 'cart-item';
-                    cartItem.innerHTML = `
-                        <img src="${image}" alt="${title}">
-                        <div class="cart-item-info">
-                            <div>${title}</div>
-                            <div class="cart-item-controls">
-                                <button onclick="decreaseQuantity('${productId}')">-</button>
-                                <span>${quantity}</span>
-                                <button onclick="increaseQuantity('${productId}')">+</button>
-                            </div>
-                            <div>$${(price * quantity).toFixed(2)}</div>
-                        </div>
-                    `;
-                    cartItemsContainer.appendChild(cartItem);
-                });
-
-                document.getElementById('cart-total').textContent = total.toFixed(2);
-            }
-
-            function decreaseQuantity(productId) {
-                if (cart[productId].quantity > 1) {
-                    cart[productId].quantity -= 1;
-                } else {
-                    delete cart[productId];
-                }
-                updateStickyCart();
-            }
-
-            function increaseQuantity(productId) {
-                cart[productId].quantity += 1;
-                updateStickyCart();
-            }
-
+            
             document.querySelectorAll('.select-design').forEach(button => {
                 button.addEventListener('click', function() {
-                    selectedProductId = this.getAttribute('data-product-id');
+                    selectedProduct = {
+                        id: this.getAttribute('data-product-id'),
+                        title: this.getAttribute('data-product-title'),
+                        price: parseFloat(this.getAttribute('data-product-price')),
+                        image: this.getAttribute('data-product-image')
+                    };
                     overlay.style.display = 'flex';
                 });
             });
-
+            
             closeBtn.addEventListener('click', function() {
                 overlay.style.display = 'none';
             });
-
-            overlay.addEventListener('click', function(event) {
-                if (event.target === overlay) {
-                    overlay.style.display = 'none';
-                }
-            });
-
+            
             saveBtn.addEventListener('click', function () {
                 const message = document.getElementById('gift-message').value;
                 const fromName = document.getElementById('gift-from').value;
                 const deliveryDate = document.getElementById('delivery-date').value;
-
+                
                 if (!message || !fromName || !deliveryDate) {
                     alert('Please fill out all fields.');
                     return;
                 }
-
+                
                 const payload = {
                     items: [
                         {
-                            id: selectedProductId, // Only use product ID, no variant_id
+                            id: selectedProduct.id,
                             quantity: 1,
                             properties: {
                                 'Gift Message': message,
@@ -229,32 +143,37 @@
                         }
                     ]
                 };
-
-                console.log('Payload being sent:', payload);
+                
                 fetch('/cart/add.js', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload),
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(data => {
-                            console.error('Error details:', data);
-                            throw new Error(data.message || 'Unknown error occurred.');
-                        });
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
-                    console.log('Success:', data);
-                    alert('Gift card customization saved!');
+                    addToCart(selectedProduct.id, selectedProduct.title, selectedProduct.price, selectedProduct.image, message, fromName, deliveryDate);
                     overlay.style.display = 'none';
                 })
-                .catch(error => {
-                    console.error('Error occurred:', error);
-                    alert(`Failed to save customization: ${error.message}`);
-                });
+                .catch(error => alert('Failed to add to cart'));
             });
+            
+            function addToCart(id, title, price, image, message, fromName, deliveryDate) {
+                cart[id] = { title, price, image, message, fromName, deliveryDate };
+                updateStickyCart();
+            }
+            
+            function updateStickyCart() {
+                const cartItemsContainer = document.getElementById('cart-items');
+                cartItemsContainer.innerHTML = '';
+                let total = 0;
+                
+                Object.values(cart).forEach(item => {
+                    total += item.price;
+                    cartItemsContainer.innerHTML += `<div><img src="${item.image}" width="50"> ${item.title} <br> From: ${item.fromName} <br> Message: ${item.message} <br> Delivery: ${item.deliveryDate}</div>`;
+                });
+                
+                document.getElementById('cart-total').textContent = total.toFixed(2);
+            }
         </script>
     </body>
     </html>
