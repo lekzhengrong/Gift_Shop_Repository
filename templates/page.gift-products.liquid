@@ -198,7 +198,7 @@
             <div id="cart-items"></div>
             <div class="cart-summary">
                 <p><strong>Total:</strong> $<span id="cart-total">0.00</span></p>
-                <button type="button" id="checkout-button">Checkout</button>
+                <button type="button" id="checkout-button">Customise your card!</button>
             </div>
         </div>
     </div>
@@ -259,8 +259,8 @@
 
                 const cartItem = document.createElement('div');
                 cartItem.className = 'cart-item';
-                cartItem.innerHTML = `
-                    <img src="${image}" alt="${title}">
+                cartItem.innerHTML = 
+                    `<img src="${image}" alt="${title}">
                     <div class="cart-item-info">
                         <div>${title}</div>
                         <div class="cart-item-controls">
@@ -269,8 +269,7 @@
                             <button onclick="increaseQuantity('${productId}')">+</button>
                         </div>
                         <div>$${(price * quantity).toFixed(2)}</div>
-                    </div>
-                `;
+                    </div>`;
                 cartItemsContainer.appendChild(cartItem);
             });
 
@@ -292,88 +291,41 @@
             updateStickyCart();
         }
 
-        // Updated Checkout button handler
-        document.getElementById('checkout-button').addEventListener('click', async function() {
-            const button = this;
-            const originalText = button.textContent;
-            const items = Object.entries(cart).map(([id, item]) => ({
-                id: id,
-                quantity: item.quantity
-            }));
+        // Customise your card button handler (Step 3 link)
+        document.getElementById('checkout-button').addEventListener('click', function() {
+            const queryParams = new URLSearchParams();
+            Object.entries(cart).forEach(([productId, item]) => {
+                queryParams.append('product_id[]', productId);
+                queryParams.append('quantity[]', item.quantity);
+            });
 
-            if (items.length === 0) {
-                alert('Your cart is empty. Add some items first!');
-                return;
-            }
-
-            try {
-                // Update button state
-                button.disabled = true;
-                button.textContent = 'Loading...';
-
-                // Send the cart data to Shopify's cart API
-                for (let item of items) {
-                    await fetch('/cart/add.js', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(item)
-                    });
-                }
-
-                // Redirect to Shopify's checkout page
-                window.location.href = '/cart';
-            } catch (error) {
-                console.error('Error proceeding to checkout:', error);
-                alert('There was an issue with checkout. Please try again.');
-                
-                // Reset button state on error
-                button.disabled = false;
-                button.textContent = originalText;
-            }
+            const url = `https://zach-theme-store.myshopify.com/pages/gift-cards?${queryParams.toString()}`;
+            window.location.href = url;
         });
 
         function getQueryParams() {
-    const params = new URLSearchParams(window.location.search);
-    return {
-        boxId: params.get('box_id'),
-        boxTitle: params.get('box_title'),
-        boxPrice: parseFloat(params.get('box_price')),
-        boxImage: params.get('box_image'),
-    };
-}
+            const params = new URLSearchParams(window.location.search);
+            return {
+                boxId: params.get('box_id'),
+                boxTitle: params.get('box_title'),
+                boxPrice: parseFloat(params.get('box_price')),
+                boxImage: params.get('box_image'),
+            };
+        }
 
-document.addEventListener('DOMContentLoaded', function () {
-    const queryParams = getQueryParams();
-    if (queryParams.boxId) {
-        // Prepopulate the sticky cart with the selected gift box
-        cart[queryParams.boxId] = {
-            title: queryParams.boxTitle,
-            price: queryParams.boxPrice,
-            quantity: 1,
-            image: queryParams.boxImage,
-        };
-        updateStickyCart();
-    }
-});
-
-function decreaseQuantity(productId) {
-    if (productId in cart && cart[productId].quantity > 1) {
-        cart[productId].quantity -= 1;
-    } else if (productId !== getQueryParams().boxId) {
-        delete cart[productId];
-        resetQuantityControls(productId);
-    }
-    updateStickyCart();
-}
-
-console.log(productName, productPrice, totalPrice); // Check values at runtime
-
-console.log("Gift Box Data:", selectedBox);
-console.log("Sticky Cart Data:", stickyCartData);
-
-
+        document.addEventListener('DOMContentLoaded', function () {
+            const queryParams = getQueryParams();
+            if (queryParams.boxId) {
+                // Prepopulate the sticky cart with the selected gift box
+                cart[queryParams.boxId] = {
+                    title: queryParams.boxTitle,
+                    price: queryParams.boxPrice,
+                    quantity: 1,
+                    image: queryParams.boxImage,
+                };
+                updateStickyCart();
+            }
+        });
     </script>
 </body>
 </html>
