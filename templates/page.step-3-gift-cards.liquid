@@ -1,3 +1,5 @@
+
+
 <div id="gift-cards-step" class="gift-cards-step">
     <!DOCTYPE html>
     <html lang="en">
@@ -6,15 +8,23 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Step 3: Add a Gift Card</title>
         <style>
+            .gift-card-options {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 20px;
+                padding: 20px;
+            }
             .gift-card-option { 
                 text-align: center; 
                 border: 1px solid #ccc; 
                 padding: 10px; 
                 border-radius: 5px;
+                background: #fff;
             }
             .gift-card-option img { 
-                width: 150px; 
+                width: 100%; 
                 height: auto; 
+                max-width: 150px;
             }
             .popup-overlay {
                 position: fixed;
@@ -94,7 +104,7 @@
                 <button type="button" id="checkout-button">Checkout</button>
             </div>
         </div>
-        
+
         <script>
             const overlay = document.getElementById('popup-overlay');
             const closeBtn = document.getElementById('popup-close');
