@@ -123,6 +123,10 @@
                 {% for product in collections['gift-cards'].products %}
                     <div class="gift-card-option">
                         <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
+                        <div class="product-info">
+                            <span class="product-name">{{ product.title }}</span>
+                            <span class="product-price">${{ product.price | divided_by: 100 }}</span>
+                        </div>
                         <button class="select-design" data-product-id="{{ product.id }}" data-product-title="{{ product.title }}" data-product-price="{{ product.price | divided_by: 100 }}" data-product-image="{{ product.featured_image | img_url: 'medium' }}">Select Design</button>
                     </div>
                 {% endfor %}
