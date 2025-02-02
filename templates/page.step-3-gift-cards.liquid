@@ -106,10 +106,18 @@
                 height: calc(100vh - 40px);
                 overflow-y: auto;
             }
+
+            .step3 {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
         </style>
     </head>
     <body>
-        <h2>Step 3: Add a Gift Card</h2>
+        <h2 class="step3">Step 3: Add a Gift Card</h2>
         <div class="container">
             <div class="gift-card-options">
                 {% for product in collections['gift-cards'].products %}
