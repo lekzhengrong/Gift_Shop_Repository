@@ -83,11 +83,12 @@
                 border-radius: 8px;
                 width: 320px;
                 box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-                text-align: left; /* Align text to the left */
+                text-align: left;
                 position: relative;
                 display: flex;
                 flex-direction: column;
                 gap: 10px;
+                font-family: Arial, sans-serif; /* Ensures font consistency */
             }
 
             .popup .close {
@@ -101,13 +102,20 @@
 
 
             .popup label {
-    
     margin-bottom: 4px;
     display: block;
 }
 
+.popup label,
+.popup input,
 .popup textarea,
-.popup input {
+.popup button {
+    font-family: inherit; /* Ensures all elements inside use the same font */
+    font-size: 14px;
+}
+
+.popup textarea,
+.popup input, {
     width: 100%;
     padding: 8px;
     margin-bottom: 10px;
