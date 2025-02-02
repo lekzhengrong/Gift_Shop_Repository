@@ -1,228 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Gift Box</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
 
-<div id="gift-cards-step" class="gift-cards-step">
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Step 3: Add a Gift Card</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                margin: 0;
-                padding: 0;
-                min-height: 100vh;
-            }
+        .container {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
 
-            .container {
-                display: flex;
-                gap: 20px;
-                padding: 20px;
-                max-width: 1400px;
-                margin: 0 auto;
-            }
+        .box-options {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            row-gap: 12px;
+        }
 
-            .gift-card-options {
-                flex: 1;
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 12px;
-                row-gap: 12px;
-            }
+        .box-option {
+            border: 1px solid #eee;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            height: fit-content;
+        }
 
-            .gift-card-option {
-                border: 1px solid #eee;
-                padding: 12px;
-                border-radius: 8px;
-                text-align: center;
-                height: fit-content;
-                background: #fff;
-            }
+        .box-option img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            display: block;
+        }
 
-            .gift-card-option img {
-                width: 100%;
-                height: 180px;
-                object-fit: cover;
-                border-radius: 4px;
-                margin-bottom: 8px;
-                display: block;
-            }
+        .product-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
 
-            .select-design {
-                width: 95%;
-                padding: 10px;
-                background: #000;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                transition: background-color 0.2s ease;
-            }
+        .select-design {
+            width: 95%;
+            padding: 10px;
+            background: #000;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
 
-            .select-design:hover {
-                background: #333;
-            }
+        .select-design:hover {
+            background: #333;
+        }
 
-            .popup-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0, 0, 0, 0.5);
-                display: none;
-                justify-content: center;
-                align-items: center;
-            }
+        .sticky-cart {
+            width: 300px;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            position: sticky;
+            top: 20px;
+            height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
 
-            .popup {
-                background: white;
-                padding: 20px;
-                border-radius: 8px;
-                width: 320px;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-                text-align: center;
-                position: relative;
-            }
+        .cart-item {
+            display: flex;
+            gap: 15px;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
 
-            .popup .close {
-                position: absolute;
-                top: 10px;
-                right: 10px;
-                cursor: pointer;
-                font-size: 18px;
-                font-weight: bold;
-            }
+        .cart-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
 
-            .sticky-cart {
-                width: 300px;
-                background: #f9f9f9;
-                padding: 20px;
-                border-radius: 8px;
-                position: sticky;
-                top: 20px;
-                height: calc(100vh - 40px);
-                overflow-y: auto;
-            }
-        </style>
-    </head>
-    <body>
-        <h2>Step 3: Add a Gift Card</h2>
-        <div class="container">
-            <div class="gift-card-options">
-                {% for product in collections['gift-cards'].products %}
-                    <div class="gift-card-option">
-                        <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-                        <button class="select-design" data-product-id="{{ product.id }}" data-product-title="{{ product.title }}" data-product-price="{{ product.price | divided_by: 100 }}" data-product-image="{{ product.featured_image | img_url: 'medium' }}">Select Design</button>
-                    </div>
-                {% endfor %}
-            </div>
-            
-            <div class="popup-overlay" id="popup-overlay">
-                <div class="popup">
-                    <span class="close" id="popup-close">&times;</span>
-                    <h3>Customize Your Gift Card</h3>
-                    <textarea id="gift-message" maxlength="200" placeholder="Enter your message (max 200 characters)"></textarea>
-                    <input type="text" id="gift-from" placeholder="From: Your name">
-                    <label for="delivery-date">Select Delivery Date:</label>
-                    <input type="date" id="delivery-date" min="">
-                    <button id="save-button">Save</button>
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .cart-item-controls button {
+            width: 25px;
+            height: 25px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            background: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        #next-button {
+            width: 100%;
+            padding: 10px;
+            background: #000;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        #next-button:hover {
+            background: #333;
+        }
+
+        #next-button:disabled {
+            cursor: default;
+            opacity: 0.7;
+        }
+
+        .step1 {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <h2 class="step1">Step 1: Choose a Gift Box</h2>
+    <div class="container">
+        <!-- Box Options -->
+        <div class="box-options">
+            {% for product in collections['gift-boxes'].products %}
+            <div class="box-option">
+                <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
+                <div class="product-info">
+                    <span class="product-name">{{ product.title }}</span>
+                    <span class="product-price">${{ product.price | divided_by: 100 }}</span>
                 </div>
+                <button class="select-design" data-id="{{ product.variants.first.id }}" data-title="{{ product.title }}" data-image="{{ product.featured_image | img_url: 'medium' }}" data-price="{{ product.price | divided_by: 100 }}">
+                    Select Design
+                </button>
             </div>
-            
-            <div class="sticky-cart">
-                <h3>Your Gift</h3>
-                <div id="cart-items"></div>
-                <p><strong>Total:</strong> $<span id="cart-total">0.00</span></p>
-                <button type="button" id="checkout-button">Checkout</button>
-            </div>
+            {% endfor %}
         </div>
 
-        <script>
-            const cart = {};
-    
-            // Handle "Select Design" button click
-            document.querySelectorAll('.select-design').forEach(button => {
-                button.addEventListener('click', function() {
-                    const boxId = this.dataset.id;
-                    const boxTitle = this.dataset.title;
-                    const boxImage = this.dataset.image;
-                    const boxPrice = parseFloat(this.dataset.price);
-    
-                    addToCart(boxId, boxTitle, boxPrice, boxImage, 1);
-                    document.getElementById('next-button').disabled = false;
-                });
+        <!-- Sticky Cart -->
+        <div class="sticky-cart">
+            <h3>Your Box</h3>
+            <div id="cart-items"></div>
+            <div class="cart-summary">
+                <p><strong>Total:</strong> $<span id="cart-total">0.00</span></p>
+                <button id="next-button" disabled>Select your gifts</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const cart = {};
+
+        // Handle "Select Design" button click
+        document.querySelectorAll('.select-design').forEach(button => {
+            button.addEventListener('click', function() {
+                const boxId = this.dataset.id;
+                const boxTitle = this.dataset.title;
+                const boxImage = this.dataset.image;
+                const boxPrice = parseFloat(this.dataset.price);
+
+                addToCart(boxId, boxTitle, boxPrice, boxImage, 1);
+                document.getElementById('next-button').disabled = false;
             });
-    
-            function addToCart(productId, title, price, image, quantity) {
-                if (!cart[productId]) {
-                    cart[productId] = { title, price, quantity, image };
-                } else {
-                    cart[productId].quantity += quantity;
-                }
-                updateStickyCart();
+        });
+
+        function addToCart(productId, title, price, image, quantity) {
+            if (!cart[productId]) {
+                cart[productId] = { title, price, quantity, image };
+            } else {
+                cart[productId].quantity += quantity;
             }
-    
-            function updateStickyCart() {
-                const cartItemsContainer = document.getElementById('cart-items');
-                cartItemsContainer.innerHTML = '';
-                let total = 0;
-    
-                Object.entries(cart).forEach(([productId, item]) => {
-                    const { title, price, quantity, image } = item;
-                    total += price * quantity;
-    
-                    const cartItem = document.createElement('div');
-                    cartItem.className = 'cart-item';
-                    cartItem.innerHTML = `
-                        <img src="${image}" alt="${title}">
-                        <div class="cart-item-info">
-                            <div>${title}</div>
-                            <div class="cart-item-controls">
-                                <button onclick="decreaseQuantity('${productId}')">-</button>
-                                <span>${quantity}</span>
-                                <button onclick="increaseQuantity('${productId}')">+</button>
-                            </div>
-                            <div>$${(price * quantity).toFixed(2)}</div>
-                        </div>
-                    `;
-                    cartItemsContainer.appendChild(cartItem);
-                });
-    
-                document.getElementById('cart-total').textContent = total.toFixed(2);
-            }
-    
-            function decreaseQuantity(productId) {
-                if (cart[productId].quantity > 1) {
-                    cart[productId].quantity -= 1;
-                } else {
-                    delete cart[productId];
-                }
-                updateStickyCart();
-            }
-    
-            function increaseQuantity(productId) {
-                cart[productId].quantity += 1;
-                updateStickyCart();
-            }
-    
-            document.getElementById('next-button').addEventListener('click', function () {
-        const selectedBox = Object.entries(cart)[0]; // Assuming the selected box is the first item in the cart
-        if (selectedBox) {
-            const [boxId, boxDetails] = selectedBox;
-            const boxParams = new URLSearchParams({
-            box_id: boxId,
-            box_title: boxDetails.title,
-            box_price: boxDetails.price,
-            box_image: boxDetails.image,
-            productName: boxDetails.title // Add this line
-             });
-    
-            window.location.href = `/pages/gift-product?${boxParams.toString()}`;
+            updateStickyCart();
         }
-    });
-    
-        </script>
-    </body>
-    </html>
-</div>
+
+        function updateStickyCart() {
+            const cartItemsContainer = document.getElementById('cart-items');
+            cartItemsContainer.innerHTML = '';
+            let total = 0;
+
+            Object.entries(cart).forEach(([productId, item]) => {
+                const { title, price, quantity, image } = item;
+                total += price * quantity;
+
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    <img src="${image}" alt="${title}">
+                    <div class="cart-item-info">
+                        <div>${title}</div>
+                        <div class="cart-item-controls">
+                            <button onclick="decreaseQuantity('${productId}')">-</button>
+                            <span>${quantity}</span>
+                            <button onclick="increaseQuantity('${productId}')">+</button>
+                        </div>
+                        <div>$${(price * quantity).toFixed(2)}</div>
+                    </div>
+                `;
+                cartItemsContainer.appendChild(cartItem);
+            });
+
+            document.getElementById('cart-total').textContent = total.toFixed(2);
+        }
+
+        function decreaseQuantity(productId) {
+            if (cart[productId].quantity > 1) {
+                cart[productId].quantity -= 1;
+            } else {
+                delete cart[productId];
+            }
+            updateStickyCart();
+        }
+
+        function increaseQuantity(productId) {
+            cart[productId].quantity += 1;
+            updateStickyCart();
+        }
+
+        document.getElementById('next-button').addEventListener('click', function () {
+    const selectedBox = Object.entries(cart)[0]; // Assuming the selected box is the first item in the cart
+    if (selectedBox) {
+        const [boxId, boxDetails] = selectedBox;
+        const boxParams = new URLSearchParams({
+        box_id: boxId,
+        box_title: boxDetails.title,
+        box_price: boxDetails.price,
+        box_image: boxDetails.image,
+        productName: boxDetails.title // Add this line
+         });
+
+        window.location.href = `/pages/gift-product?${boxParams.toString()}`;
+    }
+});
+
+    </script>
+</body>
+</html>

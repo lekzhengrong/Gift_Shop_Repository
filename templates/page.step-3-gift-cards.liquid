@@ -8,25 +8,62 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Step 3: Add a Gift Card</title>
         <style>
-            .gift-card-options {
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                min-height: 100vh;
+            }
+
+            .container {
+                display: flex;
                 gap: 20px;
                 padding: 20px;
-                height: fit-content;
+                max-width: 1400px;
+                margin: 0 auto;
             }
-            .gift-card-option { 
-                text-align: center; 
-                border: 1px solid #ccc; 
-                padding: 10px; 
-                border-radius: 5px;
+
+            .gift-card-options {
+                flex: 1;
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 12px;
+                row-gap: 12px;
+            }
+
+            .gift-card-option {
+                border: 1px solid #eee;
+                padding: 12px;
+                border-radius: 8px;
+                text-align: center;
+                height: fit-content;
                 background: #fff;
             }
-            .gift-card-option img { 
-                width: 100%; 
-                height: auto; 
-                max-width: 150px;
+
+            .gift-card-option img {
+                width: 100%;
+                height: 180px;
+                object-fit: cover;
+                border-radius: 4px;
+                margin-bottom: 8px;
+                display: block;
             }
+
+            .select-design {
+                width: 95%;
+                padding: 10px;
+                background: #000;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: background-color 0.2s ease;
+            }
+
+            .select-design:hover {
+                background: #333;
+            }
+
             .popup-overlay {
                 position: fixed;
                 top: 0;
@@ -38,22 +75,17 @@
                 justify-content: center;
                 align-items: center;
             }
-            .container {
-                display: flex;
-                gap: 20px;
-                padding: 20px;
-                max-width: 1400px;
-                margin: 0 auto;
-            }
+
             .popup {
                 background: white;
                 padding: 20px;
-                border-radius: 5px;
-                width: 300px;
+                border-radius: 8px;
+                width: 320px;
                 box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
                 text-align: center;
                 position: relative;
             }
+
             .popup .close {
                 position: absolute;
                 top: 10px;
@@ -62,6 +94,7 @@
                 font-size: 18px;
                 font-weight: bold;
             }
+
             .sticky-cart {
                 width: 300px;
                 background: #f9f9f9;
