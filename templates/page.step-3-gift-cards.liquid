@@ -1,5 +1,3 @@
-
-
 <div id="gift-cards-step" class="gift-cards-step">
     <!DOCTYPE html>
     <html lang="en">
@@ -180,7 +178,7 @@
                     <textarea id="gift-message" maxlength="200" placeholder="Enter your message (max 200 characters)"></textarea>
                     <input type="text" id="gift-from" placeholder="From: Your name">
                     <label for="delivery-date">Select Delivery Date:</label>
-                    <input type="date" id="delivery-date" min="">
+                    <input type="date" id="delivery-date" min=""/>
                     <button id="save-button">Save</button>
                 </div>
             </div>
@@ -201,7 +199,34 @@
             let selectedProduct = null;
             
             const cart = {};
-            
+
+            // Function to update the sticky cart and reflect items from Step 2
+            function updateStickyCart() {
+                const cartItemsContainer = document.getElementById('cart-items');
+                cartItemsContainer.innerHTML = '';
+                let total = 0;
+
+                // Iterate over all cart items to add them to the sticky cart
+                Object.values(cart).forEach(item => {
+                    total += item.price;
+                    cartItemsContainer.innerHTML += `<div><img src="${item.image}" width="50"> ${item.title} <br> From: ${item.fromName || 'N/A'} <br> Message: ${item.message || 'N/A'} <br> Delivery: ${item.deliveryDate || 'N/A'}</div>`;
+                });
+
+                document.getElementById('cart-total').textContent = total.toFixed(2);
+            }
+
+            // Adding items from Step 2 to the cart
+            document.addEventListener('DOMContentLoaded', function() {
+                const queryParams = new URLSearchParams(window.location.search);
+                const cartData = queryParams.get('cart') ? JSON.parse(decodeURIComponent(queryParams.get('cart'))) : [];
+
+                cartData.forEach(item => {
+                    cart[item.id] = item;
+                });
+
+                updateStickyCart();
+            });
+
             document.querySelectorAll('.select-design').forEach(button => {
                 button.addEventListener('click', function() {
                     selectedProduct = {
@@ -241,7 +266,7 @@
                         }
                     ]
                 };
-                
+
                 fetch('/cart/add.js', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -249,29 +274,33 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    addToCart(selectedProduct.id, selectedProduct.title, selectedProduct.price, selectedProduct.image, message, fromName, deliveryDate);
+                    cart[selectedProduct.id] = { 
+                        title: selectedProduct.title, 
+                        price: selectedProduct.price, 
+                        image: selectedProduct.image, 
+                        message: message, 
+                        fromName: fromName, 
+                        deliveryDate: deliveryDate 
+                    };
+                    updateStickyCart();
                     overlay.style.display = 'none';
                 })
                 .catch(error => alert('Failed to add to cart'));
             });
-            
-            function addToCart(id, title, price, image, message, fromName, deliveryDate) {
-                cart[id] = { title, price, image, message, fromName, deliveryDate };
+
+            document.addEventListener('DOMContentLoaded', function () {
+            const queryParams = getQueryParams();
+            if (queryParams.boxId) {
+                // Prepopulate the sticky cart with the selected gift box
+                cart[queryParams.boxId] = {
+                    title: queryParams.boxTitle,
+                    price: queryParams.boxPrice,
+                    quantity: 1,
+                    image: queryParams.boxImage,
+                };
                 updateStickyCart();
             }
-            
-            function updateStickyCart() {
-                const cartItemsContainer = document.getElementById('cart-items');
-                cartItemsContainer.innerHTML = '';
-                let total = 0;
-                
-                Object.values(cart).forEach(item => {
-                    total += item.price;
-                    cartItemsContainer.innerHTML += `<div><img src="${item.image}" width="50"> ${item.title} <br> From: ${item.fromName} <br> Message: ${item.message} <br> Delivery: ${item.deliveryDate}</div>`;
-                });
-                
-                document.getElementById('cart-total').textContent = total.toFixed(2);
-            }
+        });
         </script>
     </body>
     </html>
