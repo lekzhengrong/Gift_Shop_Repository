@@ -1,278 +1,333 @@
-
-
-<div id="gift-cards-step" class="gift-cards-step">
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Step 3: Add a Gift Card</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                margin: 0;
-                padding: 0;
-                min-height: 100vh;
-            }
-
-            .container {
-                display: flex;
-                gap: 20px;
-                padding: 20px;
-                max-width: 1400px;
-                margin: 0 auto;
-            }
-
-            .gift-card-options {
-                flex: 1;
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 12px;
-                row-gap: 12px;
-                height:fit-content;
-            }
-
-            .gift-card-option {
-                border: 1px solid #eee;
-                padding: 12px;
-                border-radius: 8px;
-                text-align: center;
-                height: fit-content;
-                background: #fff;
-            }
-
-            .gift-card-option img {
-                width: 100%;
-                height: 180px;
-                object-fit: cover;
-                border-radius: 4px;
-                margin-bottom: 8px;
-                display: block;
-            }
-
-            .select-design {
-                width: 95%;
-                padding: 10px;
-                background: #000;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                transition: background-color 0.2s ease;
-            }
-
-            .select-design:hover {
-                background: #333;
-            }
-
-            .popup-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0, 0, 0, 0.5);
-                display: none;
-                justify-content: center;
-                align-items: center;
-            }
-
-            .popup {
-                background: white;
-                padding: 20px;
-                border-radius: 8px;
-                width: 320px;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-                text-align: left;
-                position: relative;
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-                font-family: Arial, sans-serif; /* Ensures font consistency */
-            }
-
-            .popup .close {
-                position: absolute;
-                top: 10px;
-                right: 10px;
-                cursor: pointer;
-                font-size: 18px;
-                font-weight: bold;
-            }
-
-
-            .popup label {
-    margin-bottom: 4px;
-    display: block;
-}
-
-.popup label,
-.popup input,
-.popup textarea,
-.popup button {
-    font-family: inherit; /* Ensures all elements inside use the same font */
-    font-size: 14px;
-}
-
-.popup textarea,
-.popup input, {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-}
-            .sticky-cart {
-                width: 300px;
-                background: #f9f9f9;
-                padding: 20px;
-                border-radius: 8px;
-                position: sticky;
-                top: 20px;
-                height: calc(100vh - 40px);
-                overflow-y: auto;
-            }
-
-            .step3 {
-            display: flex;
-            gap: 20px;
-            padding: 20px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .product-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .Popup-title {
-            font-weight: bold;
-    margin-bottom: 4px;
-    display: block;
-        }
-        </style>
-    </head>
-    <body>
-        <h2 class="step3">Step 3: Add a Gift Card</h2>
-        <div class="container">
-            <div class="gift-card-options">
-                {% for product in collections['gift-cards'].products %}
-                    <div class="gift-card-option">
-                        <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-                        <div class="product-info">
-                            <span class="product-name">{{ product.title }}</span>
-                            <span class="product-price">${{ product.price | divided_by: 100 }}</span>
-                        </div>
-                        <button class="select-design" data-product-id="{{ product.id }}" data-product-title="{{ product.title }}" data-product-price="{{ product.price | divided_by: 100 }}" data-product-image="{{ product.featured_image | img_url: 'medium' }}">Select Design</button>
-                    </div>
-                {% endfor %}
-            </div>
-            
-            <div class="popup-overlay" id="popup-overlay">
-                <div class="popup">
-                    <span class="close" id="popup-close">&times;</span>
-                    <h3 class="Popup-title">Customize Your Gift Card</h3>
-                    <textarea id="gift-message" maxlength="200" placeholder="Enter your message (max 200 characters)"></textarea>
-                    <input type="text" id="gift-from" placeholder="From: Your name">
-                    <label for="delivery-date">Select Delivery Date:</label>
-                    <input type="date" id="delivery-date" min="">
-                    <button id="save-button">Save</button>
-                </div>
-            </div>
-            
-            <div class="sticky-cart">
-                <h3>Your Gift</h3>
-                <div id="cart-items"></div>
-                <p><strong>Total:</strong> $<span id="cart-total">0.00</span></p>
-                <button type="button" id="checkout-button">Checkout</button>
-            </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Step 3: Add a Gift Card</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    .container {
+      display: flex;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .gift-card-options {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      row-gap: 12px;
+      height: fit-content;
+    }
+    .gift-card-option {
+      border: 1px solid #eee;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      height: fit-content;
+      background: #fff;
+    }
+    .gift-card-option img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .select-design {
+      width: 95%;
+      padding: 10px;
+      background: #000;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    .select-design:hover {
+      background: #333;
+    }
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+    .popup {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      width: 320px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      text-align: left;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-family: Arial, sans-serif;
+    }
+    .popup .close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .popup label {
+      margin-bottom: 4px;
+      display: block;
+    }
+    .popup label,
+    .popup input,
+    .popup textarea,
+    .popup button {
+      font-family: inherit;
+      font-size: 14px;
+    }
+    .popup input,
+    .popup textarea {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .sticky-cart {
+      width: 300px;
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      position: sticky;
+      top: 20px;
+      height: calc(100vh - 40px);
+      overflow-y: auto;
+    }
+    .step3 {
+      display: flex;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .product-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    .Popup-title {
+      font-weight: bold;
+      margin-bottom: 4px;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h2 class="step3">Step 3: Add a Gift Card</h2>
+  <div class="container">
+    <div class="gift-card-options">
+      {% for product in collections['gift-cards'].products %}
+      <div class="gift-card-option">
+        <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}" />
+        <div class="product-info">
+          <span class="product-name">{{ product.title }}</span>
+          <span class="product-price">${{ product.price | divided_by: 100 }}</span>
         </div>
+        <button
+          class="select-design"
+          data-product-id="{{ product.id }}"
+          data-product-title="{{ product.title }}"
+          data-product-price="{{ product.price | divided_by: 100 }}"
+          data-product-image="{{ product.featured_image | img_url: 'medium' }}"
+        >
+          Select Design
+        </button>
+      </div>
+      {% endfor %}
+    </div>
 
-        <script>
-            const overlay = document.getElementById('popup-overlay');
-            const closeBtn = document.getElementById('popup-close');
-            const saveBtn = document.getElementById('save-button');
-            const deliveryDateInput = document.getElementById('delivery-date');
-            let selectedProduct = null;
-            
-            const cart = {};
-            
-            document.querySelectorAll('.select-design').forEach(button => {
-                button.addEventListener('click', function() {
-                    selectedProduct = {
-                        id: this.getAttribute('data-product-id'),
-                        title: this.getAttribute('data-product-title'),
-                        price: parseFloat(this.getAttribute('data-product-price')),
-                        image: this.getAttribute('data-product-image')
-                    };
-                    overlay.style.display = 'flex';
-                });
-            });
-            
-            closeBtn.addEventListener('click', function() {
-                overlay.style.display = 'none';
-            });
-            
-            saveBtn.addEventListener('click', function () {
-                const message = document.getElementById('gift-message').value;
-                const fromName = document.getElementById('gift-from').value;
-                const deliveryDate = document.getElementById('delivery-date').value;
-                
-                if (!message || !fromName || !deliveryDate) {
-                    alert('Please fill out all fields.');
-                    return;
-                }
-                
-                const payload = {
-                    items: [
-                        {
-                            id: selectedProduct.id,
-                            quantity: 1,
-                            properties: {
-                                'Gift Message': message,
-                                'From': fromName,
-                                'Delivery Date': deliveryDate,
-                            }
-                        }
-                    ]
-                };
-                
-                fetch('/cart/add.js', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    addToCart(selectedProduct.id, selectedProduct.title, selectedProduct.price, selectedProduct.image, message, fromName, deliveryDate);
-                    overlay.style.display = 'none';
-                })
-                .catch(error => alert('Failed to add to cart'));
-            });
-            
-            function addToCart(id, title, price, image, message, fromName, deliveryDate) {
-                cart[id] = { title, price, image, message, fromName, deliveryDate };
-                updateStickyCart();
+    <div class="popup-overlay" id="popup-overlay">
+      <div class="popup">
+        <span class="close" id="popup-close">&times;</span>
+        <h3 class="Popup-title">Customize Your Gift Card</h3>
+        <textarea id="gift-message" maxlength="200" placeholder="Enter your message (max 200 characters)"></textarea>
+        <input type="text" id="gift-from" placeholder="From: Your name" />
+        <label for="delivery-date">Select Delivery Date:</label>
+        <input type="date" id="delivery-date" />
+        <button id="save-button">Save</button>
+      </div>
+    </div>
+
+    <div class="sticky-cart">
+      <h3>Your Gift</h3>
+      <div id="cart-items"></div>
+      <p><strong>Total:</strong> $<span id="cart-total">0.00</span></p>
+      <button type="button" id="checkout-button">Checkout</button>
+    </div>
+  </div>
+
+  <script>
+    // --- Gift Card Popup Logic ---
+    const overlay = document.getElementById('popup-overlay');
+    const closeBtn = document.getElementById('popup-close');
+    const saveBtn = document.getElementById('save-button');
+    const deliveryDateInput = document.getElementById('delivery-date');
+    let selectedProduct = null;
+
+    // The cart will hold items from all steps
+    const cart = {};
+
+    // When a gift card is selected, show the popup for customization
+    document.querySelectorAll('.select-design').forEach(button => {
+      button.addEventListener('click', function () {
+        selectedProduct = {
+          id: this.getAttribute('data-product-id'),
+          title: this.getAttribute('data-product-title'),
+          price: parseFloat(this.getAttribute('data-product-price')),
+          image: this.getAttribute('data-product-image')
+        };
+        overlay.style.display = 'flex';
+      });
+    });
+
+    closeBtn.addEventListener('click', function () {
+      overlay.style.display = 'none';
+    });
+
+    saveBtn.addEventListener('click', function () {
+      const message = document.getElementById('gift-message').value;
+      const fromName = document.getElementById('gift-from').value;
+      const deliveryDate = document.getElementById('delivery-date').value;
+
+      if (!message || !fromName || !deliveryDate) {
+        alert('Please fill out all fields.');
+        return;
+      }
+
+      // Optional: Post the gift card to the cart via Shopify's API
+      const payload = {
+        items: [
+          {
+            id: selectedProduct.id,
+            quantity: 1,
+            properties: {
+              'Gift Message': message,
+              'From': fromName,
+              'Delivery Date': deliveryDate
             }
-            
-            function updateStickyCart() {
-                const cartItemsContainer = document.getElementById('cart-items');
-                cartItemsContainer.innerHTML = '';
-                let total = 0;
-                
-                Object.values(cart).forEach(item => {
-                    total += item.price;
-                    cartItemsContainer.innerHTML += `<div><img src="${item.image}" width="50"> ${item.title} <br> From: ${item.fromName} <br> Message: ${item.message} <br> Delivery: ${item.deliveryDate}</div>`;
-                });
-                
-                document.getElementById('cart-total').textContent = total.toFixed(2);
-            }
-        </script>
-    </body>
-    </html>
-</div>
+          }
+        ]
+      };
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+        .then(response => response.json())
+        .then(data => {
+          // Add the gift card item to our local cart
+          addToCart(selectedProduct.id, selectedProduct.title, selectedProduct.price, selectedProduct.image, message, fromName, deliveryDate);
+          overlay.style.display = 'none';
+        })
+        .catch(error => alert('Failed to add to cart'));
+    });
+
+    function addToCart(id, title, price, image, message = '', fromName = '', deliveryDate = '') {
+      // For consistency, if the item already exists, you might want to merge or override as needed
+      cart[id] = { title, price, image, message, fromName, deliveryDate };
+      updateStickyCart();
+    }
+
+    function updateStickyCart() {
+      const cartItemsContainer = document.getElementById('cart-items');
+      cartItemsContainer.innerHTML = '';
+      let total = 0;
+
+      Object.values(cart).forEach(item => {
+        total += item.price;
+        cartItemsContainer.innerHTML += `
+          <div style="margin-bottom:10px;">
+            <img src="${item.image}" width="50" style="vertical-align:middle;"> 
+            <strong>${item.title}</strong><br>
+            ${item.message ? 'Message: ' + item.message + '<br>' : ''}
+            ${item.fromName ? 'From: ' + item.fromName + '<br>' : ''}
+            ${item.deliveryDate ? 'Delivery: ' + item.deliveryDate + '<br>' : ''}
+          </div>
+        `;
+      });
+
+      document.getElementById('cart-total').textContent = total.toFixed(2);
+    }
+
+    // --- Extracting URL Parameters from Previous Steps ---
+    function populateCartFromURL() {
+      const params = new URLSearchParams(window.location.search);
+
+      // Add the gift box from Step 1 if available
+      const boxId = params.get('box_id');
+      const boxTitle = params.get('box_title');
+      const boxPrice = params.get('box_price');
+      const boxImage = params.get('box_image');
+      if (boxId && boxTitle && boxPrice && boxImage) {
+        // We assume a quantity of 1 for the gift box
+        cart[boxId] = {
+          title: boxTitle,
+          price: parseFloat(boxPrice),
+          image: boxImage
+        };
+      }
+
+      // Add gift products from Step 2 if available
+      const productIds = params.getAll('product_id[]');
+      const quantities = params.getAll('quantity[]');
+      // Note: Depending on how you want to display these items in Step 3,
+      // you may need to store additional information (e.g., product title, image, price)
+      // along with the product ID. For this example, we'll assume the product ID is unique.
+      for (let i = 0; i < productIds.length; i++) {
+        const id = productIds[i];
+        const quantity = parseInt(quantities[i]) || 1;
+        // For simplicity, here we're adding a generic placeholder.
+        // In a real scenario, you might perform an AJAX request to fetch full product details.
+        if (!cart[id]) {
+          cart[id] = {
+            title: 'Gift Product ' + id,
+            price: 0, // If price is not passed, set as 0 or retrieve via another method.
+            image: '', // Optionally, add a placeholder image.
+            quantity: quantity
+          };
+        } else {
+          // If the product already exists (e.g., as a gift box), you might want to update the quantity or handle accordingly.
+          cart[id].quantity = (cart[id].quantity || 1) + quantity;
+        }
+      }
+      updateStickyCart();
+    }
+
+    // Run the population function on page load
+    document.addEventListener('DOMContentLoaded', populateCartFromURL);
+
+    // Optionally, add a handler for the checkout button if needed
+    document.getElementById('checkout-button').addEventListener('click', function () {
+      // Redirect to checkout or process further as required
+      window.location.href = '/checkout';
+    });
+  </script>
+</body>
+</html>
