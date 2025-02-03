@@ -187,13 +187,14 @@
     const overlay = document.getElementById('popup-overlay');
     const closeBtn = document.getElementById('popup-close');
     const saveBtn = document.getElementById('save-button');
-    const deliveryDateInput = document.getElementById('delivery-date');
     let selectedProduct = null;
 
-    // The cart will hold items from all steps
+    // The cart will hold items from all steps.
+    // Items from Steps 1/2 will include a quantity property.
+    // Items added via the popup (Step 3) will have gift card customization details.
     const cart = {};
 
-    // When a gift card is selected, show the popup for customization
+    // When a gift card is selected, show the popup for customization.
     document.querySelectorAll('.select-design').forEach(button => {
       button.addEventListener('click', function () {
         selectedProduct = {
@@ -220,7 +221,7 @@
         return;
       }
 
-      // Optional: Post the gift card to the cart via Shopify's API
+      // Optional: Post the gift card to the cart via Shopify's API.
       const payload = {
         items: [
           {
@@ -242,7 +243,8 @@
       })
         .then(response => response.json())
         .then(data => {
-          // Add the gift card item to our local cart
+          // Add the gift card item to our local cart.
+          // Note: These items do not include a quantity property.
           addToCart(selectedProduct.id, selectedProduct.title, selectedProduct.price, selectedProduct.image, message, fromName, deliveryDate);
           overlay.style.display = 'none';
         })
@@ -250,7 +252,8 @@
     });
 
     function addToCart(id, title, price, image, message = '', fromName = '', deliveryDate = '') {
-      // For consistency, if the item already exists, you might want to merge or override as needed
+      // For consistency, if the item already exists, you might merge or override as needed.
+      // Here, gift card items (with message/fromName/deliveryDate) are treated separately.
       cart[id] = { title, price, image, message, fromName, deliveryDate };
       updateStickyCart();
     }
@@ -261,16 +264,33 @@
       let total = 0;
 
       Object.values(cart).forEach(item => {
-        total += item.price;
-        cartItemsContainer.innerHTML += `
-          <div style="margin-bottom:10px;">
-            <img src="${item.image}" width="50" style="vertical-align:middle;"> 
-            <strong>${item.title}</strong><br>
-            ${item.message ? 'Message: ' + item.message + '<br>' : ''}
-            ${item.fromName ? 'From: ' + item.fromName + '<br>' : ''}
-            ${item.deliveryDate ? 'Delivery: ' + item.deliveryDate + '<br>' : ''}
-          </div>
-        `;
+        // If the item has a quantity property, assume it comes from Steps 1/2.
+        if (item.hasOwnProperty('quantity')) {
+          const subtotal = item.price * item.quantity;
+          total += subtotal;
+          cartItemsContainer.innerHTML += `
+            <div style="margin-bottom:10px; display: flex; align-items: center; gap: 10px;">
+              <img src="${item.image}" width="50" style="vertical-align:middle;"> 
+              <div>
+                <strong>${item.title}</strong><br>
+                <span>Quantity: ${item.quantity}</span><br>
+                <span>Subtotal: $${subtotal.toFixed(2)}</span>
+              </div>
+            </div>
+          `;
+        } else {
+          // Otherwise, assume it's a gift card item from Step 3.
+          total += item.price; // Quantity is assumed to be 1.
+          cartItemsContainer.innerHTML += `
+            <div style="margin-bottom:10px;">
+              <img src="${item.image}" width="50" style="vertical-align:middle;"> 
+              <strong>${item.title}</strong><br>
+              ${item.message ? 'Message: ' + item.message + '<br>' : ''}
+              ${item.fromName ? 'From: ' + item.fromName + '<br>' : ''}
+              ${item.deliveryDate ? 'Delivery: ' + item.deliveryDate + '<br>' : ''}
+            </div>
+          `;
+        }
       });
 
       document.getElementById('cart-total').textContent = total.toFixed(2);
@@ -290,42 +310,40 @@
         cart[boxId] = {
           title: boxTitle,
           price: parseFloat(boxPrice),
-          image: boxImage
+          image: boxImage,
+          quantity: 1
         };
       }
 
       // Add gift products from Step 2 if available
       const productIds = params.getAll('product_id[]');
       const quantities = params.getAll('quantity[]');
-      // Note: Depending on how you want to display these items in Step 3,
-      // you may need to store additional information (e.g., product title, image, price)
-      // along with the product ID. For this example, we'll assume the product ID is unique.
       for (let i = 0; i < productIds.length; i++) {
         const id = productIds[i];
         const quantity = parseInt(quantities[i]) || 1;
-        // For simplicity, here we're adding a generic placeholder.
-        // In a real scenario, you might perform an AJAX request to fetch full product details.
+        // For simplicity, we're adding a generic placeholder.
+        // In a real scenario, you might fetch full product details via an AJAX call.
         if (!cart[id]) {
           cart[id] = {
             title: 'Gift Product ' + id,
-            price: 0, // If price is not passed, set as 0 or retrieve via another method.
+            price: 0, // Set as 0 if price is not passed.
             image: '', // Optionally, add a placeholder image.
             quantity: quantity
           };
         } else {
-          // If the product already exists (e.g., as a gift box), you might want to update the quantity or handle accordingly.
+          // If the product already exists, update the quantity.
           cart[id].quantity = (cart[id].quantity || 1) + quantity;
         }
       }
       updateStickyCart();
     }
 
-    // Run the population function on page load
+    // Run the population function on page load.
     document.addEventListener('DOMContentLoaded', populateCartFromURL);
 
-    // Optionally, add a handler for the checkout button if needed
+    // Handler for the checkout button.
     document.getElementById('checkout-button').addEventListener('click', function () {
-      // Redirect to checkout or process further as required
+      // Redirect to checkout or process further as required.
       window.location.href = '/checkout';
     });
   </script>
