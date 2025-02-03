@@ -12,7 +12,6 @@
                 padding: 0;
                 min-height: 100vh;
             }
-
             .container {
                 display: flex;
                 gap: 20px;
@@ -20,49 +19,45 @@
                 max-width: 1400px;
                 margin: 0 auto;
             }
-
             .gift-card-options {
                 flex: 1;
                 display: grid;
                 grid-template-columns: repeat(4, 1fr);
                 gap: 12px;
-                row-gap: 12px;
-                height:fit-content;
             }
-
             .gift-card-option {
                 border: 1px solid #eee;
                 padding: 12px;
                 border-radius: 8px;
                 text-align: center;
-                height: fit-content;
                 background: #fff;
             }
-
             .gift-card-option img {
                 width: 100%;
                 height: 180px;
                 object-fit: cover;
                 border-radius: 4px;
                 margin-bottom: 8px;
-                display: block;
             }
-
             .select-design {
-                width: 95%;
+                width: 100%;
                 padding: 10px;
                 background: #000;
                 color: white;
                 border: none;
                 border-radius: 4px;
                 cursor: pointer;
-                transition: background-color 0.2s ease;
             }
-
-            .select-design:hover {
-                background: #333;
+            .sticky-cart {
+                width: 300px;
+                background: #f9f9f9;
+                padding: 20px;
+                border-radius: 8px;
+                position: sticky;
+                top: 20px;
+                height: calc(100vh - 40px);
+                overflow-y: auto;
             }
-
             .popup-overlay {
                 position: fixed;
                 top: 0;
@@ -74,115 +69,37 @@
                 justify-content: center;
                 align-items: center;
             }
-
             .popup {
                 background: white;
                 padding: 20px;
                 border-radius: 8px;
                 width: 320px;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
                 text-align: left;
-                position: relative;
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-                font-family: Arial, sans-serif; /* Ensures font consistency */
             }
-
-            .popup .close {
-                position: absolute;
-                top: 10px;
-                right: 10px;
-                cursor: pointer;
-                font-size: 18px;
-                font-weight: bold;
-            }
-
-
-            .popup label {
-    margin-bottom: 4px;
-    display: block;
-}
-
-.popup label,
-.popup input,
-.popup textarea,
-.popup button {
-    font-family: inherit; /* Ensures all elements inside use the same font */
-    font-size: 14px;
-}
-
-.popup textarea,
-.popup input, {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-}
-            .sticky-cart {
-                width: 300px;
-                background: #f9f9f9;
-                padding: 20px;
-                border-radius: 8px;
-                position: sticky;
-                top: 20px;
-                height: calc(100vh - 40px);
-                overflow-y: auto;
-            }
-
-            .step3 {
-            display: flex;
-            gap: 20px;
-            padding: 20px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .product-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .Popup-title {
-            font-weight: bold;
-    margin-bottom: 4px;
-    display: block;
-        }
         </style>
     </head>
     <body>
-        <h2 class="step3">Step 3: Add a Gift Card</h2>
+        <h2>Step 3: Add a Gift Card</h2>
         <div class="container">
             <div class="gift-card-options">
                 {% for product in collections['gift-cards'].products %}
                     <div class="gift-card-option">
                         <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-                        <div class="product-info">
-                            <span class="product-name">{{ product.title }}</span>
-                            <span class="product-price">${{ product.price | divided_by: 100 }}</span>
-                        </div>
-                        <button class="select-design" data-product-id="{{ product.id }}" data-product-title="{{ product.title }}" data-product-price="{{ product.price | divided_by: 100 }}" data-product-image="{{ product.featured_image | img_url: 'medium' }}">Select Design</button>
+                        <p>{{ product.title }} - ${{ product.price | divided_by: 100 }}</p>
+                        <button class="select-design" data-id="{{ product.id }}" data-title="{{ product.title }}" data-price="{{ product.price | divided_by: 100 }}" data-image="{{ product.featured_image | img_url: 'medium' }}">Select Design</button>
                     </div>
                 {% endfor %}
             </div>
-            
             <div class="popup-overlay" id="popup-overlay">
                 <div class="popup">
                     <span class="close" id="popup-close">&times;</span>
-                    <h3 class="Popup-title">Customize Your Gift Card</h3>
-                    <textarea id="gift-message" maxlength="200" placeholder="Enter your message (max 200 characters)"></textarea>
+                    <h3>Customize Your Gift Card</h3>
+                    <textarea id="gift-message" maxlength="200" placeholder="Enter your message"></textarea>
                     <input type="text" id="gift-from" placeholder="From: Your name">
-                    <label for="delivery-date">Select Delivery Date:</label>
-                    <input type="date" id="delivery-date" min=""/>
+                    <input type="date" id="delivery-date" min="">
                     <button id="save-button">Save</button>
                 </div>
             </div>
-            
             <div class="sticky-cart">
                 <h3>Your Gift</h3>
                 <div id="cart-items"></div>
@@ -190,117 +107,47 @@
                 <button type="button" id="checkout-button">Checkout</button>
             </div>
         </div>
-
         <script>
-            const overlay = document.getElementById('popup-overlay');
-            const closeBtn = document.getElementById('popup-close');
-            const saveBtn = document.getElementById('save-button');
-            const deliveryDateInput = document.getElementById('delivery-date');
-            let selectedProduct = null;
-            
-            const cart = {};
-
-            // Function to update the sticky cart and reflect items from Step 2
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
             function updateStickyCart() {
                 const cartItemsContainer = document.getElementById('cart-items');
                 cartItemsContainer.innerHTML = '';
                 let total = 0;
-
-                // Iterate over all cart items to add them to the sticky cart
-                Object.values(cart).forEach(item => {
+                cart.forEach(item => {
                     total += item.price;
-                    cartItemsContainer.innerHTML += `<div><img src="${item.image}" width="50"> ${item.title} <br> From: ${item.fromName || 'N/A'} <br> Message: ${item.message || 'N/A'} <br> Delivery: ${item.deliveryDate || 'N/A'}</div>`;
+                    cartItemsContainer.innerHTML += `<div><img src="${item.image}" width="50"> ${item.title} - $${item.price} <br> From: ${item.from || 'N/A'} <br> Message: ${item.message || 'N/A'} <br> Delivery: ${item.deliveryDate || 'N/A'}</div>`;
                 });
-
                 document.getElementById('cart-total').textContent = total.toFixed(2);
             }
-
-            // Adding items from Step 2 to the cart
-            document.addEventListener('DOMContentLoaded', function() {
-                const queryParams = new URLSearchParams(window.location.search);
-                const cartData = queryParams.get('cart') ? JSON.parse(decodeURIComponent(queryParams.get('cart'))) : [];
-
-                cartData.forEach(item => {
-                    cart[item.id] = item;
-                });
-
-                updateStickyCart();
-            });
-
+            document.addEventListener('DOMContentLoaded', updateStickyCart);
             document.querySelectorAll('.select-design').forEach(button => {
                 button.addEventListener('click', function() {
+                    document.getElementById('popup-overlay').style.display = 'flex';
                     selectedProduct = {
-                        id: this.getAttribute('data-product-id'),
-                        title: this.getAttribute('data-product-title'),
-                        price: parseFloat(this.getAttribute('data-product-price')),
-                        image: this.getAttribute('data-product-image')
+                        id: this.dataset.id,
+                        title: this.dataset.title,
+                        price: parseFloat(this.dataset.price),
+                        image: this.dataset.image
                     };
-                    overlay.style.display = 'flex';
                 });
             });
-            
-            closeBtn.addEventListener('click', function() {
-                overlay.style.display = 'none';
+            document.getElementById('popup-close').addEventListener('click', function() {
+                document.getElementById('popup-overlay').style.display = 'none';
             });
-            
-            saveBtn.addEventListener('click', function () {
+            document.getElementById('save-button').addEventListener('click', function() {
                 const message = document.getElementById('gift-message').value;
-                const fromName = document.getElementById('gift-from').value;
+                const from = document.getElementById('gift-from').value;
                 const deliveryDate = document.getElementById('delivery-date').value;
-                
-                if (!message || !fromName || !deliveryDate) {
+                if (!message || !from || !deliveryDate) {
                     alert('Please fill out all fields.');
                     return;
                 }
-                
-                const payload = {
-                    items: [
-                        {
-                            id: selectedProduct.id,
-                            quantity: 1,
-                            properties: {
-                                'Gift Message': message,
-                                'From': fromName,
-                                'Delivery Date': deliveryDate,
-                            }
-                        }
-                    ]
-                };
-
-                fetch('/cart/add.js', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    cart[selectedProduct.id] = { 
-                        title: selectedProduct.title, 
-                        price: selectedProduct.price, 
-                        image: selectedProduct.image, 
-                        message: message, 
-                        fromName: fromName, 
-                        deliveryDate: deliveryDate 
-                    };
-                    updateStickyCart();
-                    overlay.style.display = 'none';
-                })
-                .catch(error => alert('Failed to add to cart'));
-            });
-
-            document.addEventListener('DOMContentLoaded', function () {
-            const queryParams = getQueryParams();
-            if (queryParams.boxId) {
-                // Prepopulate the sticky cart with the selected gift box
-                cart[queryParams.boxId] = {
-                    title: queryParams.boxTitle,
-                    price: queryParams.boxPrice,
-                    quantity: 1,
-                    image: queryParams.boxImage,
-                };
+                const newItem = { ...selectedProduct, message, from, deliveryDate };
+                cart.push(newItem);
+                localStorage.setItem('cart', JSON.stringify(cart));
                 updateStickyCart();
-            }
-        });
+                document.getElementById('popup-overlay').style.display = 'none';
+            });
         </script>
     </body>
     </html>
