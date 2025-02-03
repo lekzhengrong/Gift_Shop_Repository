@@ -282,12 +282,14 @@
           // Otherwise, assume it's a gift card item from Step 3.
           total += item.price; // Quantity is assumed to be 1.
           cartItemsContainer.innerHTML += `
-            <div style="margin-bottom:10px;">
+            <div style="margin-bottom:10px; display: flex; align-items: center; gap: 10px;">
               <img src="${item.image}" width="50" style="vertical-align:middle;"> 
-              <strong>${item.title}</strong><br>
-              ${item.message ? 'Message: ' + item.message + '<br>' : ''}
-              ${item.fromName ? 'From: ' + item.fromName + '<br>' : ''}
-              ${item.deliveryDate ? 'Delivery: ' + item.deliveryDate + '<br>' : ''}
+              <div>
+                <strong>${item.title}</strong><br>
+                ${item.message ? 'Message: ' + item.message + '<br>' : ''}
+                ${item.fromName ? 'From: ' + item.fromName + '<br>' : ''}
+                ${item.deliveryDate ? 'Delivery: ' + item.deliveryDate + '<br>' : ''}
+              </div>
             </div>
           `;
         }
@@ -300,13 +302,13 @@
     function populateCartFromURL() {
       const params = new URLSearchParams(window.location.search);
 
-      // Add the gift box from Step 1 if available
+      // Add the gift box from Step 1 if available.
       const boxId = params.get('box_id');
       const boxTitle = params.get('box_title');
       const boxPrice = params.get('box_price');
       const boxImage = params.get('box_image');
       if (boxId && boxTitle && boxPrice && boxImage) {
-        // We assume a quantity of 1 for the gift box
+        // We assume a quantity of 1 for the gift box.
         cart[boxId] = {
           title: boxTitle,
           price: parseFloat(boxPrice),
@@ -315,19 +317,26 @@
         };
       }
 
-      // Add gift products from Step 2 if available
+      // Add gift products from Step 2 if available.
       const productIds = params.getAll('product_id[]');
       const quantities = params.getAll('quantity[]');
+      // Try to retrieve additional details if they were passed.
+      const productTitles = params.getAll('product_title[]');
+      const productImages = params.getAll('product_image[]');
+      const productPrices = params.getAll('product_price[]');
+
       for (let i = 0; i < productIds.length; i++) {
         const id = productIds[i];
         const quantity = parseInt(quantities[i]) || 1;
-        // For simplicity, we're adding a generic placeholder.
-        // In a real scenario, you might fetch full product details via an AJAX call.
+        // Use passed title, image, and price if available; otherwise, fallback.
+        const title = productTitles[i] ? productTitles[i] : ('Gift Product ' + id);
+        const image = productImages[i] ? productImages[i] : '';
+        const price = productPrices[i] ? parseFloat(productPrices[i]) : 0;
         if (!cart[id]) {
           cart[id] = {
-            title: 'Gift Product ' + id,
-            price: 0, // Set as 0 if price is not passed.
-            image: '', // Optionally, add a placeholder image.
+            title: title,
+            price: price,
+            image: image,
             quantity: quantity
           };
         } else {
