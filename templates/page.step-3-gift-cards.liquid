@@ -175,7 +175,7 @@
     </div>
 
     <div class="sticky-cart">
-      <h3>Your Box</h3>
+      <h3>Your Gift</h3>
       <div id="cart-items"></div>
       <p><strong>Total:</strong> $<span id="cart-total">0.00</span></p>
       <button type="button" id="checkout-button">Checkout</button>
@@ -276,39 +276,49 @@
       document.getElementById('cart-total').textContent = total.toFixed(2);
     }
 
-    function getQueryParams() {
-    const params = new URLSearchParams(window.location.search);
-    return {
-        boxId: params.get('box_id'),
-        boxTitle: params.get('box_title'),
-        boxPrice: parseFloat(params.get('box_price')),
-        boxImage: params.get('box_image'),
-    };
-}
+    // --- Extracting URL Parameters from Previous Steps ---
+    function populateCartFromURL() {
+      const params = new URLSearchParams(window.location.search);
 
-document.addEventListener('DOMContentLoaded', function () {
-    const queryParams = getQueryParams();
-    if (queryParams.boxId) {
-        // Prepopulate the sticky cart with the selected gift box
-        cart[queryParams.boxId] = {
-            title: queryParams.boxTitle,
-            price: queryParams.boxPrice,
-            quantity: 1,
-            image: queryParams.boxImage,
+      // Add the gift box from Step 1 if available
+      const boxId = params.get('box_id');
+      const boxTitle = params.get('box_title');
+      const boxPrice = params.get('box_price');
+      const boxImage = params.get('box_image');
+      if (boxId && boxTitle && boxPrice && boxImage) {
+        // We assume a quantity of 1 for the gift box
+        cart[boxId] = {
+          title: boxTitle,
+          price: parseFloat(boxPrice),
+          image: boxImage
         };
-        updateStickyCart();
-    }
-});
+      }
 
-function decreaseQuantity(productId) {
-    if (productId in cart && cart[productId].quantity > 1) {
-        cart[productId].quantity -= 1;
-    } else if (productId !== getQueryParams().boxId) {
-        delete cart[productId];
-        resetQuantityControls(productId);
+      // Add gift products from Step 2 if available
+      const productIds = params.getAll('product_id[]');
+      const quantities = params.getAll('quantity[]');
+      // Note: Depending on how you want to display these items in Step 3,
+      // you may need to store additional information (e.g., product title, image, price)
+      // along with the product ID. For this example, we'll assume the product ID is unique.
+      for (let i = 0; i < productIds.length; i++) {
+        const id = productIds[i];
+        const quantity = parseInt(quantities[i]) || 1;
+        // For simplicity, here we're adding a generic placeholder.
+        // In a real scenario, you might perform an AJAX request to fetch full product details.
+        if (!cart[id]) {
+          cart[id] = {
+            title: 'Gift Product ' + id,
+            price: 0, // If price is not passed, set as 0 or retrieve via another method.
+            image: '', // Optionally, add a placeholder image.
+            quantity: quantity
+          };
+        } else {
+          // If the product already exists (e.g., as a gift box), you might want to update the quantity or handle accordingly.
+          cart[id].quantity = (cart[id].quantity || 1) + quantity;
+        }
+      }
+      updateStickyCart();
     }
-    updateStickyCart();
-}
 
     // Run the population function on page load
     document.addEventListener('DOMContentLoaded', populateCartFromURL);
