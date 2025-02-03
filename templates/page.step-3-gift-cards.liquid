@@ -136,6 +136,33 @@
       margin-bottom: 4px;
       display: block;
     }
+
+    .cart-item {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      padding: 10px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .cart-item img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+    .cart-item-details {
+      flex: 1;
+    }
+    .cart-item-title {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    .cart-item-meta {
+      font-size: 0.9em;
+      color: #666;
+    }
   </style>
 </head>
 <body>
@@ -175,11 +202,11 @@
     </div>
 
     <div class="sticky-cart">
-      <h3>Your Gift</h3>
-      <div id="cart-items"></div>
-      <p><strong>Total:</strong> $<span id="cart-total">0.00</span></p>
-      <button type="button" id="checkout-button">Checkout</button>
-    </div>
+    <h3>Your Gift</h3>
+    <div id="cart-items"></div>
+    <p><strong>Total:</strong> $<span id="cart-total">0.00</span></p>
+    <button type="button" id="checkout-button">Checkout</button>
+         </div>
   </div>
 
   <script>
@@ -250,25 +277,47 @@
     });
 
     function addToCart(id, title, price, image, message = '', fromName = '', deliveryDate = '') {
-      // For consistency, if the item already exists, you might want to merge or override as needed
-      cart[id] = { title, price, image, message, fromName, deliveryDate };
+      if (cart[id]) {
+        cart[id].quantity += 1;
+      } else {
+        cart[id] = { 
+          title, 
+          price: parseFloat(price), 
+          image, 
+          quantity: 1,
+          message, 
+          fromName, 
+          deliveryDate 
+        };
+      }
       updateStickyCart();
     }
 
+
+    // Updated cart display
     function updateStickyCart() {
       const cartItemsContainer = document.getElementById('cart-items');
       cartItemsContainer.innerHTML = '';
       let total = 0;
 
       Object.values(cart).forEach(item => {
-        total += item.price;
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+
         cartItemsContainer.innerHTML += `
-          <div style="margin-bottom:10px;">
-            <img src="${item.image}" width="50" style="vertical-align:middle;"> 
-            <strong>${item.title}</strong><br>
-            ${item.message ? 'Message: ' + item.message + '<br>' : ''}
-            ${item.fromName ? 'From: ' + item.fromName + '<br>' : ''}
-            ${item.deliveryDate ? 'Delivery: ' + item.deliveryDate + '<br>' : ''}
+          <div class="cart-item">
+            <img src="${item.image}" alt="${item.title}">
+            <div class="cart-item-details">
+              <div class="cart-item-title">${item.title}</div>
+              <div class="cart-item-meta">
+                Quantity: ${item.quantity}<br>
+                Price: $${item.price.toFixed(2)} each<br>
+                Total: $${itemTotal.toFixed(2)}
+                ${item.message ? `<br>Message: ${item.message}` : ''}
+                ${item.fromName ? `<br>From: ${item.fromName}` : ''}
+                ${item.deliveryDate ? `<br>Delivery: ${item.deliveryDate}` : ''}
+              </div>
+            </div>
           </div>
         `;
       });
@@ -277,48 +326,48 @@
     }
 
     // --- Extracting URL Parameters from Previous Steps ---
-    function populateCartFromURL() {
+        function populateCartFromURL() {
       const params = new URLSearchParams(window.location.search);
 
-      // Add the gift box from Step 1 if available
+      // Add gift box from Step 1
       const boxId = params.get('box_id');
-      const boxTitle = params.get('box_title');
-      const boxPrice = params.get('box_price');
-      const boxImage = params.get('box_image');
-      if (boxId && boxTitle && boxPrice && boxImage) {
-        // We assume a quantity of 1 for the gift box
+      if (boxId) {
         cart[boxId] = {
-          title: boxTitle,
-          price: parseFloat(boxPrice),
-          image: boxImage
+          title: params.get('box_title'),
+          price: parseFloat(params.get('box_price')),
+          image: params.get('box_image'),
+          quantity: 1
         };
       }
 
-      // Add gift products from Step 2 if available
+      // Add products from Step 2
       const productIds = params.getAll('product_id[]');
       const quantities = params.getAll('quantity[]');
-      // Note: Depending on how you want to display these items in Step 3,
-      // you may need to store additional information (e.g., product title, image, price)
-      // along with the product ID. For this example, we'll assume the product ID is unique.
+      const productTitles = params.getAll('product_title[]');
+      const productImages = params.getAll('product_image[]');
+      const productPrices = params.getAll('product_price[]');
+
       for (let i = 0; i < productIds.length; i++) {
         const id = productIds[i];
         const quantity = parseInt(quantities[i]) || 1;
-        // For simplicity, here we're adding a generic placeholder.
-        // In a real scenario, you might perform an AJAX request to fetch full product details.
-        if (!cart[id]) {
-          cart[id] = {
-            title: 'Gift Product ' + id,
-            price: 0, // If price is not passed, set as 0 or retrieve via another method.
-            image: '', // Optionally, add a placeholder image.
-            quantity: quantity
-          };
+        const title = productTitles[i];
+        const image = productImages[i];
+        const price = parseFloat(productPrices[i]);
+
+        if (cart[id]) {
+          cart[id].quantity += quantity;
         } else {
-          // If the product already exists (e.g., as a gift box), you might want to update the quantity or handle accordingly.
-          cart[id].quantity = (cart[id].quantity || 1) + quantity;
+          cart[id] = {
+            title,
+            price,
+            image,
+            quantity
+          };
         }
       }
       updateStickyCart();
     }
+
 
     // Run the population function on page load
     document.addEventListener('DOMContentLoaded', populateCartFromURL);
