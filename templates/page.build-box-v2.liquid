@@ -215,9 +215,7 @@
                     <div class="cart-item-info">
                         <div>${title}</div>
                         <div class="cart-item-controls">
-                            <button onclick="decreaseQuantity('${productId}')">-</button>
                             <span>${quantity}</span>
-                            <button onclick="increaseQuantity('${productId}')">+</button>
                         </div>
                         <div>$${(price * quantity).toFixed(2)}</div>
                     </div>
@@ -227,7 +225,7 @@
 
             document.getElementById('cart-total').textContent = total.toFixed(2);
         }
-        
+
         document.getElementById('next-button').addEventListener('click', function () {
     const selectedBox = Object.entries(cart)[0]; // Assuming the selected box is the first item in the cart
     if (selectedBox) {
