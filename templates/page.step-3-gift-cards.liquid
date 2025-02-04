@@ -301,6 +301,7 @@
     // --- Extracting URL Parameters from Previous Steps ---
     function populateCartFromURL() {
       const params = new URLSearchParams(window.location.search);
+      console.log('All URL params:', Object.fromEntries(params.entries()));
 
       // Add the gift box from Step 1 if available.
       const boxId = params.get('box_id');
