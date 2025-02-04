@@ -227,21 +227,7 @@
 
             document.getElementById('cart-total').textContent = total.toFixed(2);
         }
-
-        function decreaseQuantity(productId) {
-            if (cart[productId].quantity > 1) {
-                cart[productId].quantity -= 1;
-            } else {
-                delete cart[productId];
-            }
-            updateStickyCart();
-        }
-
-        function increaseQuantity(productId) {
-            cart[productId].quantity += 1;
-            updateStickyCart();
-        }
-
+        
         document.getElementById('next-button').addEventListener('click', function () {
     const selectedBox = Object.entries(cart)[0]; // Assuming the selected box is the first item in the cart
     if (selectedBox) {
