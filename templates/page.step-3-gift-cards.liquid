@@ -151,7 +151,7 @@
         </div>
         <button
           class="select-design"
-          data-product-id="{{ product.id }}"
+          data-product-id="{{ product.variants.first.id }}"
           data-product-title="{{ product.title }}"
           data-product-price="{{ product.price | divided_by: 100 }}"
           data-product-image="{{ product.featured_image | img_url: 'medium' }}"
