@@ -212,44 +212,57 @@
     });
 
     saveBtn.addEventListener('click', function () {
-      const message = document.getElementById('gift-message').value;
-      const fromName = document.getElementById('gift-from').value;
-      const deliveryDate = document.getElementById('delivery-date').value;
+  const message = document.getElementById('gift-message').value;
+  const fromName = document.getElementById('gift-from').value;
+  const deliveryDate = document.getElementById('delivery-date').value;
 
-      if (!message || !fromName || !deliveryDate) {
-        alert('Please fill out all fields.');
-        return;
-      }
+  if (!message || !fromName || !deliveryDate) {
+    alert('Please fill out all fields.');
+    return;
+  }
 
-      // Optional: Post the gift card to the cart via Shopify's API.
+  // Fetch the current cart first to preserve existing items.
+  fetch('/cart.js')
+    .then(response => response.json())
+    .then(cartData => {
+      const existingItems = cartData.items.map(item => ({
+        id: item.id,
+        quantity: item.quantity,
+        properties: item.properties || {}
+      }));
+
+      // Add the new gift card item to the existing cart items.
+      const newItem = {
+        id: selectedProduct.id,
+        quantity: 1,
+        properties: {
+          'Gift Message': message,
+          'From': fromName,
+          'Delivery Date': deliveryDate
+        }
+      };
+      existingItems.push(newItem);
+
       const payload = {
-        items: [
-          {
-            id: selectedProduct.id,
-            quantity: 1,
-            properties: {
-              'Gift Message': message,
-              'From': fromName,
-              'Delivery Date': deliveryDate
-            }
-          }
-        ]
+        items: existingItems
       };
 
-      fetch('/cart/add.js', {
+      // Update the cart with the merged items list.
+      fetch('/cart/update.js', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       })
         .then(response => response.json())
         .then(data => {
-          // Add the gift card item to our local cart.
-          // Note: These items do not include a quantity property.
           addToCart(selectedProduct.id, selectedProduct.title, selectedProduct.price, selectedProduct.image, message, fromName, deliveryDate);
           overlay.style.display = 'none';
         })
-        .catch(error => alert('Failed to add to cart'));
-    });
+        .catch(error => alert('Failed to update cart'));
+    })
+    .catch(error => alert('Failed to retrieve cart'));
+});
+
 
     function addToCart(id, title, price, image, message = '', fromName = '', deliveryDate = '') {
       // For consistency, if the item already exists, you might merge or override as needed.
