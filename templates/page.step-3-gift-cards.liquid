@@ -212,46 +212,44 @@
     });
 
     saveBtn.addEventListener('click', function () {
-  const message = document.getElementById('gift-message').value;
-  const fromName = document.getElementById('gift-from').value;
-  const deliveryDate = document.getElementById('delivery-date').value;
+      const message = document.getElementById('gift-message').value;
+      const fromName = document.getElementById('gift-from').value;
+      const deliveryDate = document.getElementById('delivery-date').value;
 
-  if (!message || !fromName || !deliveryDate) {
-    alert('Please fill out all fields.');
-    return;
-  }
-
-  // Create the gift card item
-  const payload = {
-    items: [
-      {
-        id: selectedProduct.id,
-        quantity: 1,
-        properties: {
-          'Gift Message': message,
-          'From': fromName,
-          'Delivery Date': deliveryDate
-        }
+      if (!message || !fromName || !deliveryDate) {
+        alert('Please fill out all fields.');
+        return;
       }
-    ]
-  };
 
-  // Use /cart/add.js to add the gift card to the existing cart
-  fetch('/cart/add.js', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  })
-    .then(response => response.json())
-    .then(data => {
-      addToCart(selectedProduct.id, selectedProduct.title, selectedProduct.price, selectedProduct.image, message, fromName, deliveryDate);
-      overlay.style.display = 'none';
-      console.log('Cart after adding:', data);  // Debugging the cart contents
-    })
-    .catch(error => alert('Failed to add to cart'));
-});
+      // Optional: Post the gift card to the cart via Shopify's API.
+      const payload = {
+        items: [
+          {
+            id: selectedProduct.id,
+            quantity: 1,
+            properties: {
+              'Gift Message': message,
+              'From': fromName,
+              'Delivery Date': deliveryDate
+            }
+          }
+        ]
+      };
 
-
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+        .then(response => response.json())
+        .then(data => {
+          // Add the gift card item to our local cart.
+          // Note: These items do not include a quantity property.
+          addToCart(selectedProduct.id, selectedProduct.title, selectedProduct.price, selectedProduct.image, message, fromName, deliveryDate);
+          overlay.style.display = 'none';
+        })
+        .catch(error => alert('Failed to add to cart'));
+    });
 
     function addToCart(id, title, price, image, message = '', fromName = '', deliveryDate = '') {
       // For consistency, if the item already exists, you might merge or override as needed.
@@ -301,94 +299,63 @@
     }
 
     // --- Extracting URL Parameters from Previous Steps ---
-      function populateCartFromURL() {
-  const params = new URLSearchParams(window.location.search);
-  console.log('All URL params:', Object.fromEntries(params.entries()));
+    function populateCartFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      console.log('All URL params:', Object.fromEntries(params.entries()));
 
-  // Add the gift box from Step 1 if available.
-  const boxId = params.get('box_id');
-  const boxTitle = decodeURIComponent(params.get('box_title') || '');
-  const boxPrice = parseFloat(params.get('box_price')) || 0;
-  const boxImage = decodeURIComponent(params.get('box_image') || '');
-  if (boxId && boxTitle && boxPrice && boxImage) {
-    // We assume a quantity of 1 for the gift box.
-    cart[boxId] = {
-      title: boxTitle,
-      price: boxPrice,
-      image: boxImage,
-      quantity: 1
-    };
-  }
+      // Add the gift box from Step 1 if available.
+      const boxId = params.get('box_id');
+      const boxTitle = params.get('box_title');
+      const boxPrice = params.get('box_price');
+      const boxImage = params.get('box_image');
+      if (boxId && boxTitle && boxPrice && boxImage) {
+        // We assume a quantity of 1 for the gift box.
+        cart[boxId] = {
+          title: boxTitle,
+          price: parseFloat(boxPrice),
+          image: boxImage,
+          quantity: 1
+        };
+      }
 
-  // Add gift products from Step 2 if available.
-  const productIds = params.getAll('product_id[]');
-  const quantities = params.getAll('quantity[]');
-  const productTitles = params.getAll('product_title[]');
-  const productImages = params.getAll('product_image[]');
-  const productPrices = params.getAll('product_price[]');
+      // Add gift products from Step 2 if available.
+      const productIds = params.getAll('product_id[]');
+      const quantities = params.getAll('quantity[]');
+      // Try to retrieve additional details if they were passed.
+      const productTitles = params.getAll('product_title[]');
+      const productImages = params.getAll('product_image[]');
+      const productPrices = params.getAll('product_price[]');
 
-  for (let i = 0; i < productIds.length; i++) {
-    const id = productIds[i];
-    const quantity = parseInt(quantities[i]) || 1;
-    const title = decodeURIComponent(productTitles[i] || `Gift Product ${id}`);
-    const image = decodeURIComponent(productImages[i] || '');
-    const price = parseFloat(productPrices[i]) || 0;
-
-    if (!cart[id]) {
-      cart[id] = {
-        title: title,
-        price: price,
-        image: image,
-        quantity: quantity
-      };
-    } else {
-      // Update the quantity if the product already exists in the cart.
-      cart[id].quantity = (cart[id].quantity || 1) + quantity;
+      for (let i = 0; i < productIds.length; i++) {
+        const id = productIds[i];
+        const quantity = parseInt(quantities[i]) || 1;
+        // Use passed title, image, and price if available; otherwise, fallback.
+        const title = productTitles[i] ? productTitles[i] : ('Gift Product ' + id);
+        const image = productImages[i] ? productImages[i] : '';
+        const price = productPrices[i] ? parseFloat(productPrices[i]) : 0;
+        if (!cart[id]) {
+          cart[id] = {
+            title: title,
+            price: price,
+            image: image,
+            quantity: quantity
+          };
+        } else {
+          // If the product already exists, update the quantity.
+          cart[id].quantity = (cart[id].quantity || 1) + quantity;
+        }
+      }
+      updateStickyCart();
     }
-  }
-  updateStickyCart();
-}
-
 
     // Run the population function on page load.
     document.addEventListener('DOMContentLoaded', populateCartFromURL);
 
     // Handler for the checkout button.
     document.getElementById('checkout-button').addEventListener('click', function () {
-  const payload = {
-    items: []
-  };
-
-  // Iterate through all items in the local cart object and prepare the payload.
-  Object.values(cart).forEach(item => {
-    const itemData = {
-      id: item.id,
-      quantity: item.quantity || 1,
-      properties: {}
-    };
-
-    // Add custom properties if present (for gift cards).
-    if (item.message) itemData.properties['Gift Message'] = item.message;
-    if (item.fromName) itemData.properties['From'] = item.fromName;
-    if (item.deliveryDate) itemData.properties['Delivery Date'] = item.deliveryDate;
-
-    payload.items.push(itemData);
-  });
-
-  // Add all items to Shopify's cart before checkout.
-  fetch('/cart/add.js', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Cart updated before checkout:', data);
-      // Redirect to checkout
+      // Redirect to checkout or process further as required.
       window.location.href = '/checkout';
-    })
-    .catch(error => alert('Failed to add items to cart before checkout'));
-});
+    });
   </script>
 </body>
 </html>
