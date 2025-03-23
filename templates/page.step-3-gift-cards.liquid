@@ -301,54 +301,54 @@
     }
 
     // --- Extracting URL Parameters from Previous Steps ---
-    function populateCartFromURL() {
-      const params = new URLSearchParams(window.location.search);
-      console.log('All URL params:', Object.fromEntries(params.entries()));
+      function populateCartFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  console.log('All URL params:', Object.fromEntries(params.entries()));
 
-      // Add the gift box from Step 1 if available.
-      const boxId = params.get('box_id');
-      const boxTitle = params.get('box_title');
-      const boxPrice = params.get('box_price');
-      const boxImage = params.get('box_image');
-      if (boxId && boxTitle && boxPrice && boxImage) {
-        // We assume a quantity of 1 for the gift box.
-        cart[boxId] = {
-          title: boxTitle,
-          price: parseFloat(boxPrice),
-          image: boxImage,
-          quantity: 1
-        };
-      }
+  // Add the gift box from Step 1 if available.
+  const boxId = params.get('box_id');
+  const boxTitle = decodeURIComponent(params.get('box_title') || '');
+  const boxPrice = parseFloat(params.get('box_price')) || 0;
+  const boxImage = decodeURIComponent(params.get('box_image') || '');
+  if (boxId && boxTitle && boxPrice && boxImage) {
+    // We assume a quantity of 1 for the gift box.
+    cart[boxId] = {
+      title: boxTitle,
+      price: boxPrice,
+      image: boxImage,
+      quantity: 1
+    };
+  }
 
-      // Add gift products from Step 2 if available.
-      const productIds = params.getAll('product_id[]');
-      const quantities = params.getAll('quantity[]');
-      // Try to retrieve additional details if they were passed.
-      const productTitles = params.getAll('product_title[]');
-      const productImages = params.getAll('product_image[]');
-      const productPrices = params.getAll('product_price[]');
+  // Add gift products from Step 2 if available.
+  const productIds = params.getAll('product_id[]');
+  const quantities = params.getAll('quantity[]');
+  const productTitles = params.getAll('product_title[]');
+  const productImages = params.getAll('product_image[]');
+  const productPrices = params.getAll('product_price[]');
 
-      for (let i = 0; i < productIds.length; i++) {
-        const id = productIds[i];
-        const quantity = parseInt(quantities[i]) || 1;
-        // Use passed title, image, and price if available; otherwise, fallback.
-        const title = productTitles[i] ? productTitles[i] : ('Gift Product ' + id);
-        const image = productImages[i] ? productImages[i] : '';
-        const price = productPrices[i] ? parseFloat(productPrices[i]) : 0;
-        if (!cart[id]) {
-          cart[id] = {
-            title: title,
-            price: price,
-            image: image,
-            quantity: quantity
-          };
-        } else {
-          // If the product already exists, update the quantity.
-          cart[id].quantity = (cart[id].quantity || 1) + quantity;
-        }
-      }
-      updateStickyCart();
+  for (let i = 0; i < productIds.length; i++) {
+    const id = productIds[i];
+    const quantity = parseInt(quantities[i]) || 1;
+    const title = decodeURIComponent(productTitles[i] || `Gift Product ${id}`);
+    const image = decodeURIComponent(productImages[i] || '');
+    const price = parseFloat(productPrices[i]) || 0;
+
+    if (!cart[id]) {
+      cart[id] = {
+        title: title,
+        price: price,
+        image: image,
+        quantity: quantity
+      };
+    } else {
+      // Update the quantity if the product already exists in the cart.
+      cart[id].quantity = (cart[id].quantity || 1) + quantity;
     }
+  }
+  updateStickyCart();
+}
+
 
     // Run the population function on page load.
     document.addEventListener('DOMContentLoaded', populateCartFromURL);
