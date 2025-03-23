@@ -355,9 +355,40 @@
 
     // Handler for the checkout button.
     document.getElementById('checkout-button').addEventListener('click', function () {
-      // Redirect to checkout or process further as required.
+  const payload = {
+    items: []
+  };
+
+  // Iterate through all items in the local cart object and prepare the payload.
+  Object.values(cart).forEach(item => {
+    const itemData = {
+      id: item.id,
+      quantity: item.quantity || 1,
+      properties: {}
+    };
+
+    // Add custom properties if present (for gift cards).
+    if (item.message) itemData.properties['Gift Message'] = item.message;
+    if (item.fromName) itemData.properties['From'] = item.fromName;
+    if (item.deliveryDate) itemData.properties['Delivery Date'] = item.deliveryDate;
+
+    payload.items.push(itemData);
+  });
+
+  // Add all items to Shopify's cart before checkout.
+  fetch('/cart/add.js', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Cart updated before checkout:', data);
+      // Redirect to checkout
       window.location.href = '/checkout';
-    });
+    })
+    .catch(error => alert('Failed to add items to cart before checkout'));
+});
   </script>
 </body>
 </html>
