@@ -351,11 +351,30 @@
     // Run the population function on page load.
     document.addEventListener('DOMContentLoaded', populateCartFromURL);
 
-    // Handler for the checkout button.
-    document.getElementById('checkout-button').addEventListener('click', function () {
-      // Redirect to checkout or process further as required.
-      window.location.href = '/checkout';
-    });
+// Handler for the checkout button.
+document.getElementById('checkout-button').addEventListener('click', function () {
+    const items = Object.values(cart).map(item => ({
+        id: item.id,
+        quantity: item.quantity || 1,
+        properties: {
+            ...(item.message && { 'Gift Message': item.message }),
+            ...(item.fromName && { 'From': item.fromName }),
+            ...(item.deliveryDate && { 'Delivery Date': item.deliveryDate })
+        }
+    }));
+
+    fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items })
+    })
+    .then(response => response.json())
+    .then(data => {
+        window.location.href = '/checkout';
+    })
+    .catch(error => alert('Failed to add items to cart'));
+});
+
   </script>
 </body>
 </html>
