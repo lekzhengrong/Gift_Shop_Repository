@@ -192,13 +192,13 @@
         });
 
         function addToCart(productId, title, price, image, quantity) {
-            if (!cart[productId]) {
-                cart[productId] = { title, price, quantity, image };
-            } else {
-                cart[productId].quantity += quantity;
-            }
-            updateStickyCart();
-        }
+    if (!cart[productId]) {
+        cart[productId] = { id: productId, title, price, quantity, image };
+    } else {
+        cart[productId].quantity += quantity;
+    }
+    updateStickyCart();
+}
 
         function updateStickyCart() {
             const cartItemsContainer = document.getElementById('cart-items');

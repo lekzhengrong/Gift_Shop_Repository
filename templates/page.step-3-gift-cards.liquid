@@ -255,7 +255,7 @@
     function addToCart(id, title, price, image, message = '', fromName = '', deliveryDate = '') {
       // For consistency, if the item already exists, you might merge or override as needed.
       // Here, gift card items (with message/fromName/deliveryDate) are treated separately.
-      cart[id] = { title, price, image, message, fromName, deliveryDate };
+      cart[id] = { id, title, price, image, message, fromName, deliveryDate };
       updateStickyCart();
     }
 
