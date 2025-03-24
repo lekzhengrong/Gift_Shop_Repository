@@ -364,6 +364,9 @@ document.getElementById('checkout-button').addEventListener('click', function ()
         }
     }));
 
+          // Log the items being sent to the cart for debugging
+    console.log('Checkout Payload:', JSON.stringify({ items }, null, 2));
+    
     fetch('/cart/add.js', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
