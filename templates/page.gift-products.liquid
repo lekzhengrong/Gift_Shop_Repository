@@ -305,18 +305,20 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            const queryParams = getQueryParams();
-            if (queryParams.boxId) {
-                // Prepopulate the sticky cart with the selected gift box
-                cart[queryParams.boxId] = {
-                    title: queryParams.boxTitle,
-                    price: queryParams.boxPrice,
-                    quantity: 1,
-                    image: queryParams.boxImage,
-                };
-                updateStickyCart();
-            }
-        });
+    const queryParams = getQueryParams();
+    if (queryParams.boxId) {
+        // Prepopulate the sticky cart with the selected gift box, including its ID.
+        cart[queryParams.boxId] = {
+            id: queryParams.boxId, // Added ID property
+            title: queryParams.boxTitle,
+            price: queryParams.boxPrice,
+            quantity: 1,
+            image: queryParams.boxImage,
+        };
+        updateStickyCart();
+    }
+});
+
 
         // (If you have multiple definitions of decreaseQuantity, ensure only one is used.)
     </script>
