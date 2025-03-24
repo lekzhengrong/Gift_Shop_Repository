@@ -237,10 +237,20 @@
       };
 
       fetch('/cart/add.js', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        items: Object.values(cart).map(item => ({
+            id: item.id,
+            quantity: item.quantity || 1,
+            properties: item.properties || {}
+        }))
+    })
+})
+.then(response => response.json())
+.then(data => {
+    window.location.href = '/checkout';
+});
         .then(response => response.json())
         .then(data => {
           // Add the gift card item to our local cart.
