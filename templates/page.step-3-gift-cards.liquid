@@ -151,7 +151,7 @@
         </div>
         <button
           class="select-design"
-          data-product-id="{{ product.variants.first.id }}"
+          data-product-id="{{ product.id }}"
           data-product-title="{{ product.title }}"
           data-product-price="{{ product.price | divided_by: 100 }}"
           data-product-image="{{ product.featured_image | img_url: 'medium' }}"
@@ -237,20 +237,10 @@
       };
 
       fetch('/cart/add.js', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        items: Object.values(cart).map(item => ({
-            id: item.id,
-            quantity: item.quantity || 1,
-            properties: item.properties || {}
-        }))
-    })
-})
-.then(response => response.json())
-.then(data => {
-    window.location.href = '/checkout';
-});
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
         .then(response => response.json())
         .then(data => {
           // Add the gift card item to our local cart.
