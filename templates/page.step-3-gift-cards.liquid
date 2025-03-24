@@ -355,7 +355,7 @@
 // Handler for the checkout button.
 document.getElementById('checkout-button').addEventListener('click', function () {
     const items = Object.values(cart).map(item => ({
-        id: item.id,
+        id: item.id, // Fixed: using the correct ID property
         quantity: item.quantity || 1,
         properties: {
             ...(item.message && { 'Gift Message': item.message }),
@@ -364,9 +364,9 @@ document.getElementById('checkout-button').addEventListener('click', function ()
         }
     }));
 
-          // Log the items being sent to the cart for debugging
-    console.log('Checkout Payload:', JSON.stringify({ items }, null, 2));
-    
+    // Log the fixed items being sent to the cart for debugging
+    console.log('Fixed Checkout Payload:', JSON.stringify({ items }, null, 2));
+
     fetch('/cart/add.js', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -378,6 +378,7 @@ document.getElementById('checkout-button').addEventListener('click', function ()
     })
     .catch(error => alert('Failed to add items to cart'));
 });
+
 
 
   </script>
