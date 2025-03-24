@@ -150,14 +150,15 @@
           <span class="product-price">${{ product.price | divided_by: 100 }}</span>
         </div>
         <button
-          class="select-design"
-          data-product-id="{{ product.id }}"
-          data-product-title="{{ product.title }}"
-          data-product-price="{{ product.price | divided_by: 100 }}"
-          data-product-image="{{ product.featured_image | img_url: 'medium' }}"
-        >
-          Select Design
-        </button>
+        class="select-design"
+        data-product-id="{{ product.variants.first.id }}" 
+        data-product-title="{{ product.title }}"
+        data-product-price="{{ product.price | divided_by: 100 }}"
+        data-product-image="{{ product.featured_image | img_url: 'medium' }}"
+      >
+        Select Design
+      </button>
+      
       </div>
       {% endfor %}
     </div>
@@ -225,7 +226,7 @@
       const payload = {
         items: [
           {
-            id: selectedProduct.id,
+            id: selectedProduct.variant_id,
             quantity: 1,
             properties: {
               'Gift Message': message,
@@ -375,6 +376,7 @@ document.getElementById('checkout-button').addEventListener('click', function ()
     .catch(error => alert('Failed to add items to cart'));
 });
 
+console.log('Payload:', JSON.stringify(payload, null, 2));
   </script>
 </body>
 </html>
