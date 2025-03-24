@@ -236,7 +236,7 @@
           }
         ]
       };
-
+      console.log('Payload:', JSON.stringify(payload, null, 2));
       fetch('/cart/add.js', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -376,7 +376,7 @@ document.getElementById('checkout-button').addEventListener('click', function ()
     .catch(error => alert('Failed to add items to cart'));
 });
 
-console.log('Payload:', JSON.stringify(payload, null, 2));
+
   </script>
 </body>
 </html>
