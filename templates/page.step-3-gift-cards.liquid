@@ -383,8 +383,10 @@ document.getElementById('checkout-button').addEventListener('click', function() 
     });
 
     const url = `https://zach-theme-store.myshopify.com/pages/gift-cards?${queryParams.toString()}`;
+    console.log("Redirecting to:", url);  // Log the final URL
     window.location.href = url;
 });
+
       
 
 
