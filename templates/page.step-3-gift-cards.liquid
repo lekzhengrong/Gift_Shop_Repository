@@ -359,6 +359,9 @@ document.getElementById('checkout-button').addEventListener('click', function() 
         return;
     }
 
+    // Log the cart data before proceeding to checkout
+    console.log('Cart contents:', cart);  // Add this log to check if cart is populated correctly
+
     const queryParams = new URLSearchParams();
 
     // Retrieve gift box data if it's already saved in the cart
@@ -390,8 +393,6 @@ document.getElementById('checkout-button').addEventListener('click', function() 
     console.log("Redirecting to:", url);  // Log the final URL
     window.location.href = url;
 });
-
-
 
   </script>
 </body>
