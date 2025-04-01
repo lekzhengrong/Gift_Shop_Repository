@@ -225,19 +225,24 @@ function updateStickyCart() {
     document.getElementById('cart-total').textContent = total.toFixed(2);
 }
 
-        document.getElementById('next-button').addEventListener('click', function () {
-    const selectedBox = Object.entries(cart)[0]; // Assuming the selected box is the first item in the cart
-    if (selectedBox) {
-        const [boxId, boxDetails] = selectedBox;
-        const boxParams = new URLSearchParams({
-        box_id: boxId,
-        box_title: boxDetails.title,
-        box_price: boxDetails.price,
-        box_image: boxDetails.image,
-        productName: boxDetails.title // Add this line
-         });
+document.getElementById('next-button').addEventListener('click', function () {
+    const savedBox = localStorage.getItem('selectedGiftBox');
+    if (savedBox) {
+        const box = JSON.parse(savedBox);
 
+        // Construct the query parameters for Step 2.
+        const boxParams = new URLSearchParams({
+            box_id: box.id,
+            box_title: box.title,
+            box_price: box.price,
+            box_image: box.image,
+            productName: box.title // Add this line if needed
+        });
+
+        // Redirect to Step 2 with the correct parameters.
         window.location.href = `/pages/gift-product?${boxParams.toString()}`;
+    } else {
+        alert('Please select a gift box first!');
     }
 });
 
