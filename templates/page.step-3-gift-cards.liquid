@@ -361,17 +361,20 @@ document.getElementById('checkout-button').addEventListener('click', function() 
 
     const queryParams = new URLSearchParams();
 
-    // Add gift box data if it exists
+    // Retrieve gift box data if it's already saved in the cart
     const savedBox = localStorage.getItem('selectedGiftBox');
     if (savedBox) {
         const box = JSON.parse(savedBox);
-        queryParams.append('box_id', box.id);
-        queryParams.append('box_title', box.title);
-        queryParams.append('box_price', box.price);
-        queryParams.append('box_image', box.image);
+        // Check if the box is already in the cart to prevent adding it again.
+        if (!cart[box.id]) {
+            queryParams.append('box_id', box.id);
+            queryParams.append('box_title', box.title);
+            queryParams.append('box_price', box.price);
+            queryParams.append('box_image', box.image);
+        }
     }
 
-    // Add selected gift products
+    // Add selected gift products to the query params.
     Object.entries(cart).forEach(([productId, item]) => {
         if (productId !== savedBox?.id) { // Avoid duplicating the gift box
             queryParams.append('product_id[]', productId);
@@ -382,12 +385,12 @@ document.getElementById('checkout-button').addEventListener('click', function() 
         }
     });
 
+    // Redirect to the checkout with the correct URL.
     const url = `https://zach-theme-store.myshopify.com/pages/gift-cards?${queryParams.toString()}`;
     console.log("Redirecting to:", url);  // Log the final URL
     window.location.href = url;
 });
 
-      
 
 
   </script>
