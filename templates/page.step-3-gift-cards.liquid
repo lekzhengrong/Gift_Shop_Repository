@@ -212,45 +212,55 @@
       overlay.style.display = 'none';
     });
 
-    saveBtn.addEventListener('click', function () {
-      const message = document.getElementById('gift-message').value;
-      const fromName = document.getElementById('gift-from').value;
-      const deliveryDate = document.getElementById('delivery-date').value;
+  // Save button click handler in Step 3
+saveBtn.addEventListener('click', function () {
+    const message = document.getElementById('gift-message').value;
+    const fromName = document.getElementById('gift-from').value;
+    const deliveryDate = document.getElementById('delivery-date').value;
 
-      if (!message || !fromName || !deliveryDate) {
+    if (!message || !fromName || !deliveryDate) {
         alert('Please fill out all fields.');
         return;
-      }
+    }
 
-      // Optional: Post the gift card to the cart via Shopify's API.
-      const payload = {
+    // Post the gift card to the cart via Shopify's API.
+    const payload = {
         items: [
-          {
-            id: selectedProduct.id,
-            quantity: 1,
-            properties: {
-              'Gift Message': message,
-              'From': fromName,
-              'Delivery Date': deliveryDate
+            {
+                id: selectedProduct.id,
+                quantity: 1, // Make sure quantity is 1 for the gift card
+                properties: {
+                    'Gift Message': message,
+                    'From': fromName,
+                    'Delivery Date': deliveryDate
+                }
             }
-          }
         ]
-      };
-      console.log('Payload:', JSON.stringify(payload, null, 2));
-      fetch('/cart/add.js', {
+    };
+
+    console.log('Payload:', JSON.stringify(payload, null, 2)); // Check the payload
+
+    fetch('/cart/add.js', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-      })
-        .then(response => response.json())
-        .then(data => {
-          // Add the gift card item to our local cart.
-          // Note: These items do not include a quantity property.
-          addToCart(selectedProduct.id, selectedProduct.title, selectedProduct.price, selectedProduct.image, message, fromName, deliveryDate);
-          overlay.style.display = 'none';
-        })
-        .catch(error => alert('Failed to add to cart'));
-    });
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Add the gift card item to our local cart.
+        // Ensure quantity is properly handled for gift cards
+        addToCart(selectedProduct.id, selectedProduct.title, selectedProduct.price, selectedProduct.image, message, fromName, deliveryDate, 1);
+        overlay.style.display = 'none';
+    })
+    .catch(error => alert('Failed to add to cart'));
+});
+
+// Adding to cart in the local cart array
+function addToCart(id, title, price, image, message = '', fromName = '', deliveryDate = '', quantity = 1) {
+    // Ensure quantity is always 1 for gift cards
+    cart[id] = { id, title, price, image, message, fromName, deliveryDate, quantity };
+    updateStickyCart();
+}
 
     function addToCart(id, title, price, image, message = '', fromName = '', deliveryDate = '') {
       // For consistency, if the item already exists, you might merge or override as needed.
