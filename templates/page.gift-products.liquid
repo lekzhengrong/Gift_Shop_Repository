@@ -232,34 +232,41 @@
     updateStickyCart();
 }
 
-        function updateStickyCart() {
-            const cartItemsContainer = document.getElementById('cart-items');
-            cartItemsContainer.innerHTML = '';
-            let total = 0;
+function updateStickyCart() {
+    const cartItemsContainer = document.getElementById('cart-items');
+    cartItemsContainer.innerHTML = '';
+    let total = 0;
 
-            Object.entries(cart).forEach(([productId, item]) => {
-                const { title, price, quantity, image } = item;
-                total += price * quantity;
+    // Check for saved gift box in localStorage
+    const savedBox = localStorage.getItem('selectedGiftBox');
+    if (savedBox) {
+        const box = JSON.parse(savedBox);
+        cart[box.id] = box;  // Ensure it is added to cart
+    }
 
-                const cartItem = document.createElement('div');
-                cartItem.className = 'cart-item';
-                cartItem.innerHTML = `
-                    <img src="${image}" alt="${title}">
-                    <div class="cart-item-info">
-                        <div>${title}</div>
-                        <div class="cart-item-controls">
-                            <button onclick="decreaseQuantity('${productId}')">-</button>
-                            <span>${quantity}</span>
-                            <button onclick="increaseQuantity('${productId}')">+</button>
-                        </div>
-                        <div>$${(price * quantity).toFixed(2)}</div>
-                    </div>
-                `;
-                cartItemsContainer.appendChild(cartItem);
-            });
+    // Render items from cart (including gift box)
+    Object.entries(cart).forEach(([productId, item]) => {
+        total += item.price * item.quantity;
 
-            document.getElementById('cart-total').textContent = total.toFixed(2);
-        }
+        const cartItem = document.createElement('div');
+        cartItem.className = 'cart-item';
+        cartItem.innerHTML = `
+            <img src="${item.image}" alt="${item.title}">
+            <div class="cart-item-info">
+                <div>${item.title}</div>
+                <div class="cart-item-controls">
+                    <button onclick="decreaseQuantity('${productId}')">-</button>
+                    <span>${item.quantity}</span>
+                    <button onclick="increaseQuantity('${productId}')">+</button>
+                </div>
+                <div>$${(item.price * item.quantity).toFixed(2)}</div>
+            </div>
+        `;
+        cartItemsContainer.appendChild(cartItem);
+    });
+
+    document.getElementById('cart-total').textContent = total.toFixed(2);
+}
 
         function decreaseQuantity(productId) {
             if (cart[productId].quantity > 1) {

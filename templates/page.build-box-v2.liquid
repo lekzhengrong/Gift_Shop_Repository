@@ -192,40 +192,38 @@
         });
 
         function addToCart(productId, title, price, image, quantity) {
-    if (!cart[productId]) {
-        cart[productId] = { id: productId, title, price, quantity, image };
-    } else {
-        cart[productId].quantity += quantity;
-    }
+    const cartItem = { id: productId, title, price, quantity, image };
+    localStorage.setItem('selectedGiftBox', JSON.stringify(cartItem)); // Store in localStorage
     updateStickyCart();
 }
 
-        function updateStickyCart() {
-            const cartItemsContainer = document.getElementById('cart-items');
-            cartItemsContainer.innerHTML = '';
-            let total = 0;
+function updateStickyCart() {
+    const cartItemsContainer = document.getElementById('cart-items');
+    cartItemsContainer.innerHTML = '';
+    let total = 0;
 
-            Object.entries(cart).forEach(([productId, item]) => {
-                const { title, price, quantity, image } = item;
-                total += price * quantity;
+    const savedBox = localStorage.getItem('selectedGiftBox');
+    if (savedBox) {
+        const item = JSON.parse(savedBox);
+        total += item.price * item.quantity;
 
-                const cartItem = document.createElement('div');
-                cartItem.className = 'cart-item';
-                cartItem.innerHTML = `
-                    <img src="${image}" alt="${title}">
-                    <div class="cart-item-info">
-                        <div>${title}</div>
-                        <div class="cart-item-controls">
-                            <span>Quantity: ${quantity}</span>
-                        </div>
-                        <div>$${(price * quantity).toFixed(2)}</div>
-                    </div>
-                `;
-                cartItemsContainer.appendChild(cartItem);
-            });
+        const cartItem = document.createElement('div');
+        cartItem.className = 'cart-item';
+        cartItem.innerHTML = `
+            <img src="${item.image}" alt="${item.title}">
+            <div class="cart-item-info">
+                <div>${item.title}</div>
+                <div class="cart-item-controls">
+                    <span>Quantity: ${item.quantity}</span>
+                </div>
+                <div>$${(item.price * item.quantity).toFixed(2)}</div>
+            </div>
+        `;
+        cartItemsContainer.appendChild(cartItem);
+    }
 
-            document.getElementById('cart-total').textContent = total.toFixed(2);
-        }
+    document.getElementById('cart-total').textContent = total.toFixed(2);
+}
 
         document.getElementById('next-button').addEventListener('click', function () {
     const selectedBox = Object.entries(cart)[0]; // Assuming the selected box is the first item in the cart
@@ -242,6 +240,9 @@
         window.location.href = `/pages/gift-product?${boxParams.toString()}`;
     }
 });
+
+document.addEventListener('DOMContentLoaded', updateStickyCart);
+
 
     </script>
 </body>
