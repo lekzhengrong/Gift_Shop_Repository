@@ -362,7 +362,7 @@ function addToCart(id, title, price, image, message = '', fromName = '', deliver
     // Run the population function on page load.
     document.addEventListener('DOMContentLoaded', populateCartFromURL);
 
-// Handler for the checkout button.
+/// Handler for the checkout button.
 document.getElementById('checkout-button').addEventListener('click', function() {
     if (Object.keys(cart).length === 0) {
         alert('Your cart is empty. Add some items first!');
@@ -370,15 +370,16 @@ document.getElementById('checkout-button').addEventListener('click', function() 
     }
 
     // Log the cart data before proceeding to checkout
-    console.log('Cart contents:', cart);  // Add this log to check if cart is populated correctly
+    console.log('Checking cart object:', cart);  // Debug: Ensure cart is defined and populated
 
     const queryParams = new URLSearchParams();
 
     // Retrieve gift box data if it's already saved in the cart
     const savedBox = localStorage.getItem('selectedGiftBox');
+    console.log("Saved Gift Box:", savedBox);  // Debug: Check if gift box is being retrieved
+
     if (savedBox) {
         const box = JSON.parse(savedBox);
-        // Check if the box is already in the cart to prevent adding it again.
         if (!cart[box.id]) {
             queryParams.append('box_id', box.id);
             queryParams.append('box_title', box.title);
@@ -389,7 +390,7 @@ document.getElementById('checkout-button').addEventListener('click', function() 
 
     // Add selected gift products to the query params.
     Object.entries(cart).forEach(([productId, item]) => {
-        if (productId !== savedBox?.id) { // Avoid duplicating the gift box
+        if (productId !== savedBox?.id) {
             queryParams.append('product_id[]', productId);
             queryParams.append('quantity[]', item.quantity);
             queryParams.append('product_title[]', item.title);
@@ -398,11 +399,15 @@ document.getElementById('checkout-button').addEventListener('click', function() 
         }
     });
 
-    // Redirect to the checkout with the correct URL.
+    // Log final cart contents before redirect
+    console.log("Final cart contents before checkout:", queryParams.toString());  
+
+    // Redirect to checkout
     const url = `https://zach-theme-store.myshopify.com/pages/gift-cards?${queryParams.toString()}`;
-    console.log("Redirecting to:", url);  // Log the final URL
+    console.log("Redirecting to:", url);  // Debug: Ensure the correct URL is being generated
     window.location.href = url;
 });
+
 
   </script>
 </body>
